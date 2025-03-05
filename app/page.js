@@ -7,13 +7,15 @@ import styles from './page.module.css';
 const HomePageConfig = () => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
   const [players, setPlayers] = useState([]);
+  const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
 
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      newPlayers.push({ name: '', birthDate: '' });
+      newPlayers.push({ name: '', isOldest: false });
     }
     setPlayers(newPlayers);
+    setOldestPlayerIndex(null);
   }, [numberOfPlayers]);
 
   const handlePlayerChange = (index, field, value) => {
@@ -22,14 +24,34 @@ const HomePageConfig = () => {
     setPlayers(updatedPlayers);
   };
 
+  const handleOldestPlayerSelection = (index) => {
+    if (oldestPlayerIndex === index) {
+      // Si on clique sur la case déjà cochée, on la décoche
+      setOldestPlayerIndex(null);
+      const updatedPlayers = players.map((player) => ({
+        ...player,
+        isOldest: false
+      }));
+      setPlayers(updatedPlayers);
+    } else {
+      // Sinon, on sélectionne ce joueur comme le plus âgé
+      setOldestPlayerIndex(index);
+      const updatedPlayers = players.map((player, i) => ({
+        ...player,
+        isOldest: i === index
+      }));
+      setPlayers(updatedPlayers);
+    }
+  };
+
   const validateForm = () => {
-    return players.every(player => player.name && player.birthDate);
+    return players.every(player => player.name) && oldestPlayerIndex !== null;
   };
 
   const handleLaunchGame = (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      alert('Veuillez remplir tous les champs pour chaque joueur.');
+      alert('Veuillez remplir tous les champs et sélectionner un joueur le plus âgé.');
       return;
     }
     console.log('Configuration de la partie:', { numberOfPlayers, players });
@@ -70,6 +92,8 @@ const HomePageConfig = () => {
                 index={index}
                 player={player}
                 onChange={handlePlayerChange}
+                onSelectOldest={handleOldestPlayerSelection}
+                isOldest={index === oldestPlayerIndex}
               />
             ))}
           </div>
@@ -85,7 +109,7 @@ const HomePageConfig = () => {
   );
 };
 
-const PlayerInputRow = ({ index, player, onChange }) => (
+const PlayerInputRow = ({ index, player, onChange, onSelectOldest, isOldest }) => (
   <div className={styles.playerRow}>
     <h3>Joueur {index + 1}</h3>
     <div className={styles.inputGroup}>
@@ -99,13 +123,14 @@ const PlayerInputRow = ({ index, player, onChange }) => (
       />
     </div>
     <div className={styles.inputGroup}>
-      <label htmlFor={`player-birth-${index}`}>Date de naissance :</label>
-      <input
-        type="date"
-        id={`player-birth-${index}`}
-        value={player.birthDate}
-        onChange={(e) => onChange(index, 'birthDate', e.target.value)}
-      />
+      <label>
+        <input
+          type="checkbox"
+          checked={isOldest}
+          onChange={() => onSelectOldest(index)}
+        />
+        Joueur le plus âgé
+      </label>
     </div>
   </div>
 );
