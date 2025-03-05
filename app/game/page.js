@@ -2,12 +2,12 @@
 
 import React from 'react';
 import Head from 'next/head';
-// import { useGame } from '../context/GameContext';
+import { useGame } from '../context/GameContext';
 import styles from './game.module.css';
 
 const GamePage = () => {
   // Récupération de la configuration du jeu depuis le contexte
- // const { gameConfig } = useGame();
+  const { gameConfig } = useGame();
 
   return (
     <div className={styles.container}>
