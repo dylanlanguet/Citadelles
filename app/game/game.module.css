@@ -43,3 +43,10 @@
     border-top: 1px solid rgba(255, 255, 255, 0.3);
   }
   
+
+  .cardsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  

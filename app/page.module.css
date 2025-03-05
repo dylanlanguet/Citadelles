@@ -1,7 +1,7 @@
 .container {
   min-height: 100vh;
   padding: 0 2rem;
-  background: url('/images/medieval-background.jpg') no-repeat center center fixed;
+  background: url('/BackgroundImage.jpg') no-repeat center center fixed;
   background-size: cover;
   color: #fff;
 }
