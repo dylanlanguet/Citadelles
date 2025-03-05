@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Card from './card'; // Assure-toi que le chemin correspond à l'emplacement de ton composant Card
+import Card from '../../models/card'; // Assure-toi que le chemin correspond à l'emplacement de ton composant Card
 import styles from './playerHand.module.css';
 
 const PlayerHand = ({ hand }) => {

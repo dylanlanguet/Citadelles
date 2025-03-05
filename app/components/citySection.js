@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Card from './card'; // Ajuste le chemin si besoin
+import Card from '../../models/card'; // Ajuste le chemin si besoin
 import styles from './citySection.module.css';
 
 const CitySection = ({ cityDistrictsData }) => {

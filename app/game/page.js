@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import Card from '../components/card';
 import CitySection from '../components/citySection';
+import { GameProvider, useGame } from '../context/gameContext';
+import Card from '../../models/card'; // Ton composant de carte déjà existant
+import ActionButton from '../components/actionButton'; // Notre nouveau composant
+import CitySection from '../components/citySection'; // Composant séparé pour la cité (déjà créé)
 import styles from './game.module.css';
 
 const GameContent = () => {
@@ -26,6 +30,7 @@ const GameContent = () => {
   ];
 
   // 🔹 Données simulées pour la cité construite
+  // Données simulées pour la cité construite (quartiers posés)
   const cityDistrictsData = [
     { id: 101, title: 'District 1', content: 'Quartier commerçant' },
     { id: 102, title: 'District 2', content: 'Quartier résidentiel' },
@@ -33,6 +38,31 @@ const GameContent = () => {
   ];
 
   const currentPlayer = playersData[currentPlayerIndex];
+  const handleHandCardClick = (id) => {
+    console.log(`Carte de main ${id} cliquée`);
+    setSelectedHandCard(id);
+  };
+
+  // Gestionnaires pour les actions de jeu
+  const handleTakeCoins = () => {
+    console.log("Action : Prendre 2 pièces");
+    // Ajoute ici la logique pour prendre 2 pièces
+  };
+
+  const handleDrawGold = () => {
+    console.log("Action : Piocher de l'or");
+    // Logique pour le pouvoir du personnage (piocher de l'or)
+  };
+
+  const handleDrawCards = () => {
+    console.log("Action : Piocher des cartes");
+    // Logique pour piocher des cartes
+  };
+
+  const handlePassTurn = () => {
+    console.log("Action : Passer son tour");
+    // Logique pour passer son tour
+  };
 
   return (
     <div className={styles.container}>
@@ -59,6 +89,7 @@ const GameContent = () => {
 
       <main className={styles.main}>
         {/* 🔹 Section des infos de la partie */}
+        {/* Section d'informations sur la partie */}
         <section className={styles.gameInfo}>
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
@@ -83,6 +114,38 @@ const GameContent = () => {
             ))}
           </div>
         </section>
+        {/* Section de la cité */}
+        <CitySection cityDistrictsData={cityDistrictsData} />
+
+        {/* Séparateur visuel */}
+        <hr className={styles.separator} />
+
+        {/* Conteneur pour la main et les boutons d'action */}
+        <div className={styles.bottomContainer}>
+          {/* Section de la main du joueur */}
+          <section className={styles.handSection}>
+            <h2>Votre main</h2>
+            <div className={styles.handContainer}>
+              {handCardsData.map((card) => (
+                <Card
+                  key={card.id}
+                  title={card.title}
+                  content={card.content}
+                  onClick={() => handleHandCardClick(card.id)}
+                  selected={card.id === selectedHandCard}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* Section des boutons d'action */}
+          <aside className={styles.actionsContainer}>
+            <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
+            <ActionButton label="Piocher de l'or" onClick={handleDrawGold} disabled={false} />
+            <ActionButton label="Piocher des cartes" onClick={handleDrawCards} disabled={false} />
+            <ActionButton label="Passer son tour" onClick={handlePassTurn} disabled={false} />
+          </aside>
+        </div>
       </main>
 
       <footer className={styles.footer}>
