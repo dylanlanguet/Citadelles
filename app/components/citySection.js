@@ -1,7 +1,8 @@
+// components/citySection.js
 'use client';
 
 import React, { useState } from 'react';
-import Card from '../../models/card'; // Ajuste le chemin si besoin
+import CardView from '../components/cardView';
 import styles from './citySection.module.css';
 
 const CitySection = ({ cityDistrictsData }) => {
@@ -10,7 +11,6 @@ const CitySection = ({ cityDistrictsData }) => {
   const handleCityCardClick = (id) => {
     console.log(`Quartier ${id} cliqué`);
     setSelectedCityCard(id);
-    // Ajoute ici la logique spécifique pour la cité si nécessaire
   };
 
   return (
@@ -18,10 +18,9 @@ const CitySection = ({ cityDistrictsData }) => {
       <h2>Votre cité</h2>
       <div className={styles.cityContainer}>
         {cityDistrictsData.map((district) => (
-          <Card
+          <CardView
             key={district.id}
-            title={district.title}
-            content={district.content}
+            card={district}
             onClick={() => handleCityCardClick(district.id)}
             selected={district.id === selectedCityCard}
           />

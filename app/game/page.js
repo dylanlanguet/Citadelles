@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import Card from '../components/card';
 import CitySection from '../components/citySection';
-import { GameProvider, useGame } from '../context/gameContext';
-import Card from '../../models/card'; // Ton composant de carte déjà existant
-import ActionButton from '../components/actionButton'; // Notre nouveau composant
-import CitySection from '../components/citySection'; // Composant séparé pour la cité (déjà créé)
+import CardView from '../components/cardView';
+import ActionButton from '../components/actionButton';
+import PlayerCarousel from '../components/PlayerCarousel';
+import { GameProvider } from '../context/gameContext';
 import styles from './game.module.css';
 
 const GameContent = () => {
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [currentTurn, setCurrentTurn] = useState(1); // ✅ Ajout du suivi du tour
+  const [districtDeck, setDistrictDeck] = useState([]);
+  const [characterDeck, setCharacterDeck] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 🔹 Données simulées des joueurs (en attendant la dynamisation)
+  // Exemple de données simulées pour les joueurs
   const playersData = [
     { id: 1, name: 'Alice', role: 'Roi', gold: 5, points: 10 },
     { id: 2, name: 'Bob', role: 'Marchand', gold: 7, points: 12 },
@@ -22,46 +22,51 @@ const GameContent = () => {
     { id: 4, name: 'David', role: 'Évêque', gold: 6, points: 15 },
   ];
 
-  // 🔹 Données simulées pour la main du joueur
-  const handCardsData = [
-    { id: 1, title: 'Carte 1', content: 'Détails de la carte 1' },
-    { id: 2, title: 'Carte 2', content: 'Détails de la carte 2' },
-    { id: 3, title: 'Carte 3', content: 'Détails de la carte 3' },
-  ];
+  const [selectedHandCard, setSelectedHandCard] = useState(null);
+  const [currentPlayerIndex] = useState(0);
+  const [currentTurn] = useState(1);
 
-  // 🔹 Données simulées pour la cité construite
-  // Données simulées pour la cité construite (quartiers posés)
-  const cityDistrictsData = [
-    { id: 101, title: 'District 1', content: 'Quartier commerçant' },
-    { id: 102, title: 'District 2', content: 'Quartier résidentiel' },
-    { id: 103, title: 'District 3', content: 'Quartier religieux' },
-  ];
+  // Pour le moment, on utilisera le districtDeck pour afficher les BuildingCards
+  // et éventuellement le characterDeck pour le choix des personnages.
+
+  // Chargement des decks depuis l'API
+  useEffect(() => {
+    async function loadDecks() {
+      const response = await fetch('/api/decks');
+      const data = await response.json();
+      setDistrictDeck(data.districtDeck);
+      setCharacterDeck(data.characterDeck);
+      setLoading(false);
+    }
+    loadDecks();
+  }, []);
+
+  if (loading) {
+    return <div>Chargement des decks...</div>;
+  }
 
   const currentPlayer = playersData[currentPlayerIndex];
+
   const handleHandCardClick = (id) => {
     console.log(`Carte de main ${id} cliquée`);
     setSelectedHandCard(id);
   };
 
-  // Gestionnaires pour les actions de jeu
+  // Gestionnaires pour les actions
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
-    // Ajoute ici la logique pour prendre 2 pièces
   };
 
   const handleDrawGold = () => {
     console.log("Action : Piocher de l'or");
-    // Logique pour le pouvoir du personnage (piocher de l'or)
   };
 
   const handleDrawCards = () => {
     console.log("Action : Piocher des cartes");
-    // Logique pour piocher des cartes
   };
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
-    // Logique pour passer son tour
   };
 
   return (
@@ -71,8 +76,8 @@ const GameContent = () => {
         <meta name="description" content="Affichage de la partie en cours" />
       </Head>
 
-      {/* ✅ NAVBAR - Infos du joueur actuel et du tour */}
       <nav className={styles.navbar}>
+        {/* Informations du tour et du joueur */}
         <div className={styles.turnInfo}>
           <span className={styles.turnNumber}>🕰️ Tour {currentTurn}</span>
         </div>
@@ -87,58 +92,43 @@ const GameContent = () => {
         </div>
       </nav>
 
+      {/* Carousel des joueurs */}
+      <div className={styles.carouselWrapper}>
+        <PlayerCarousel players={playersData} currentPlayerIndex={currentPlayerIndex} />
+      </div>
+
       <main className={styles.main}>
-        {/* 🔹 Section des infos de la partie */}
-        {/* Section d'informations sur la partie */}
+        {/* Section d'informations de la partie */}
         <section className={styles.gameInfo}>
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
         </section>
 
-        {/* 🔹 Section de la cité (quartiers construits) */}
-        <CitySection cityDistrictsData={cityDistrictsData} />
+        {/* Section de la cité */}
+        <CitySection cityDistrictsData={districtDeck} />
 
-        {/* Séparateur */}
         <hr className={styles.separator} />
 
-        {/* 🔹 Section de la main du joueur */}
+        {/* Section de la main du joueur */}
         <section className={styles.handSection}>
           <h2>Votre main</h2>
           <div className={styles.handContainer}>
-            {handCardsData.map((card) => (
-              <Card
+            {/* Ici tu peux choisir d’afficher par exemple les 4 premières cartes du districtDeck */}
+            {districtDeck.slice(0, 4).map((card) => (
+              <CardView
                 key={card.id}
-                title={card.title}
-                content={card.content}
+                card={card}
+                onClick={() => handleHandCardClick(card.id)}
+                selected={card.id === selectedHandCard}
               />
             ))}
           </div>
         </section>
-        {/* Section de la cité */}
-        <CitySection cityDistrictsData={cityDistrictsData} />
 
-        {/* Séparateur visuel */}
         <hr className={styles.separator} />
 
-        {/* Conteneur pour la main et les boutons d'action */}
+        {/* Section des boutons d'action */}
         <div className={styles.bottomContainer}>
-          {/* Section de la main du joueur */}
-          <section className={styles.handSection}>
-            <h2>Votre main</h2>
-            <div className={styles.handContainer}>
-              {handCardsData.map((card) => (
-                <Card
-                  key={card.id}
-                  title={card.title}
-                  content={card.content}
-                  onClick={() => handleHandCardClick(card.id)}
-                  selected={card.id === selectedHandCard}
-                />
-              ))}
-            </div>
-          </section>
-
-          {/* Section des boutons d'action */}
           <aside className={styles.actionsContainer}>
             <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
             <ActionButton label="Piocher de l'or" onClick={handleDrawGold} disabled={false} />
@@ -155,4 +145,12 @@ const GameContent = () => {
   );
 };
 
-export default GameContent;
+const GamePage = () => {
+  return (
+    <GameProvider>
+      <GameContent />
+    </GameProvider>
+  );
+};
+
+export default GamePage;

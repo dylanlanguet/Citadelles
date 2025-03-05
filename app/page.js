@@ -1,13 +1,15 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation'; // Import du hook pour la navigation
 import styles from './page.module.css';
 
 const HomePageConfig = () => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
+  const router = useRouter(); // Initialisation du router
 
   useEffect(() => {
     const newPlayers = [];
@@ -29,21 +31,21 @@ const HomePageConfig = () => {
       setOldestPlayerIndex(null);
       const updatedPlayers = players.map((player) => ({
         ...player,
-        isOldest: false
+        isOldest: false,
       }));
       setPlayers(updatedPlayers);
     } else {
       setOldestPlayerIndex(index);
       const updatedPlayers = players.map((player, i) => ({
         ...player,
-        isOldest: i === index
+        isOldest: i === index,
       }));
       setPlayers(updatedPlayers);
     }
   };
 
   const validateForm = () => {
-    return players.every(player => player.name) && oldestPlayerIndex !== null;
+    return players.every((player) => player.name) && oldestPlayerIndex !== null;
   };
 
   const handleLaunchGame = (e) => {
@@ -53,8 +55,8 @@ const HomePageConfig = () => {
       return;
     }
     console.log('Configuration de la partie:', { numberOfPlayers, players });
-    alert('Partie lancée! (La redirection vers la page de jeu sera implémentée ultérieurement)');
-    // router.push('/game');
+    // Redirection vers la page /game
+    router.push('/game');
   };
 
   return (

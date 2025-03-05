@@ -1,33 +1,42 @@
+// app/context/gameContext.js
 'use client';
 
-import { createContext, useState, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
-// Création du contexte
-const GameContext = createContext();
-
-// Fournisseur qui englobe l'application et rend l'état accessible partout
-export const GameProvider = ({ children }) => {
-  // L'état initial peut inclure le nombre de joueurs et la liste des joueurs
-  const [gameConfig, setGameConfig] = useState({
+const GameContext = createContext({
+  gameConfig: {
     numberOfPlayers: 4,
-    players: [],
-    // On pourra ajouter ici d'autres informations au fur et à mesure, comme l'ordre des tours, etc.
-  });
+    players: [
+      { name: 'Alice', birthDate: '1990-01-01' },
+      { name: 'Bob', birthDate: '1991-02-02' },
+      { name: 'Charlie', birthDate: '1992-03-03' },
+      { name: 'David', birthDate: '1993-04-04' }
+    ]
+  },
+  updateGameConfig: () => {}
+});
 
-  // Fonction pour mettre à jour la configuration de jeu
+export const GameProvider = ({ children }) => {
+  // Contexte factice : on renvoie juste une config par défaut et une fonction d'update qui fait un console.log.
+  const dummyGameConfig = {
+    numberOfPlayers: 4,
+    players: [
+      { name: 'Alice', birthDate: '1990-01-01' },
+      { name: 'Bob', birthDate: '1991-02-02' },
+      { name: 'Charlie', birthDate: '1992-03-03' },
+      { name: 'David', birthDate: '1993-04-04' }
+    ]
+  };
+
   const updateGameConfig = (newConfig) => {
-    setGameConfig((prevConfig) => ({
-      ...prevConfig,
-      ...newConfig,
-    }));
+    console.log("dummy updateGameConfig called with:", newConfig);
   };
 
   return (
-    <GameContext.Provider value={{ gameConfig, updateGameConfig }}>
+    <GameContext.Provider value={{ gameConfig: dummyGameConfig, updateGameConfig }}>
       {children}
     </GameContext.Provider>
   );
 };
 
-// Hook personnalisé pour accéder facilement au contexte
 export const useGame = () => useContext(GameContext);
