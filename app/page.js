@@ -5,7 +5,7 @@ import Head from 'next/head';
 import styles from './page.module.css';
 
 const HomePageConfig = () => {
-  const [numberOfPlayers, setNumberOfPlayers] = useState(2);
+  const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
 
@@ -26,7 +26,6 @@ const HomePageConfig = () => {
 
   const handleOldestPlayerSelection = (index) => {
     if (oldestPlayerIndex === index) {
-      // Si on clique sur la case déjà cochée, on la décoche
       setOldestPlayerIndex(null);
       const updatedPlayers = players.map((player) => ({
         ...player,
@@ -34,7 +33,6 @@ const HomePageConfig = () => {
       }));
       setPlayers(updatedPlayers);
     } else {
-      // Sinon, on sélectionne ce joueur comme le plus âgé
       setOldestPlayerIndex(index);
       const updatedPlayers = players.map((player, i) => ({
         ...player,
@@ -77,8 +75,9 @@ const HomePageConfig = () => {
               id="numberOfPlayers"
               value={numberOfPlayers}
               onChange={(e) => setNumberOfPlayers(parseInt(e.target.value))}
+              className={styles.select}
             >
-              {Array.from({ length: 7 }, (_, i) => i + 2).map((num) => (
+              {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
                 <option key={num} value={num}>
                   {num} joueurs
                 </option>
