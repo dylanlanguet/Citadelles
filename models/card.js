@@ -1,15 +1,13 @@
-'use client';
-
-import React from 'react';
-import styles from './card.module.css';
-
-const Card = ({ title, content, onClick, selected }) => {
-  return (
-    <div className={`${styles.card} ${selected ? styles.selected : ''}`} onClick={onClick}>
-      <h3>{title}</h3>
-      <p>{content}</p>
-    </div>
-  );
-};
-
-export default Card;
+// models/Card.js
+export class Card {
+  constructor(id, title, content) {
+    this.id = id;
+    this.title = title;
+    this.content = content;
+  }
+  
+  // Méthode générique à redéfinir dans les sous-classes
+  play() {
+    throw new Error('La méthode play() doit être redéfinie dans une sous-classe');
+  }
+}
