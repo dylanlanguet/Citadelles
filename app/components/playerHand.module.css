@@ -1,0 +1,7 @@
+.handContainer {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 10px;
+  }
+  
