@@ -2,9 +2,11 @@
 import { Card } from './card';
 
 export class CharacterCard extends Card {
-  constructor(id, title, content, power) {
+  constructor(id, title, content, type, power, rank) {
     super(id, title, content);
+    this.type = type;
     this.power = power; // Pouvoir spécifique du personnage a passer a tant que classe ?
+    this.rank = rank;
   }
 
   play() {

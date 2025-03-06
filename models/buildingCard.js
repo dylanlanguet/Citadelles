@@ -2,9 +2,12 @@
 import { Card } from './card';
 
 export  class BuildingCard extends Card {
-  constructor(id, title, content, cost) {
+  constructor(id, title, content, type, cost, utility, quantity) {
     super(id, title, content);
-    this.cost = cost; // Coût de construction par exemple
+    this.type = type;
+    this.cost = cost; 
+    this.utility = utility;
+    this.quantity = quantity;
   }
 
   play() {
