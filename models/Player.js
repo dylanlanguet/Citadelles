@@ -1,9 +1,9 @@
 'use strict';
 
 export class Player {
-  constructor(name, birthDate, isOldest = false) {
+  constructor(name, isOldest = false) {
     this.name = name;
-    this.birthDate = birthDate;
+    
     this.isOldest = isOldest; // Indique si ce joueur est le plus âgé (et donc qui commence)
     this.resources = 0;
     this.hand = [];

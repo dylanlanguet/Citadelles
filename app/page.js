@@ -15,7 +15,7 @@ const HomePageConfig = () => {
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      // Création d'une instance de Player avec nom vide, birthDate vide et isOldest false par défaut
+      // Création d'une instance de Player avec nom vide, et isOldest false par défaut
       newPlayers.push(new Player('', ''));
     }
     setPlayers(newPlayers);
