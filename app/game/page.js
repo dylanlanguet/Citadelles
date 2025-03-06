@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import CitySection from '../components/citySection';
 import CardView from '../components/cardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
 import { useGame } from '../context/gameContext';
+import { GameEngine } from '../../models/GameEngine';
 import styles from './game.module.css';
 
 const GameContent = () => {
@@ -15,16 +16,24 @@ const GameContent = () => {
   const [characterDeck, setCharacterDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
+  const [updateCounter, setUpdateCounter] = useState(0); // state pour forcer le re-render
 
-  // Vérifier que la configuration est disponible
+  // Utiliser une ref pour stocker l'instance du moteur
+  const engineRef = useRef(null);
+
+  // Vérifier que la configuration est bien chargée
   if (!gameConfig.players || gameConfig.players.length === 0) {
     return <div>Chargement de la configuration...</div>;
   }
 
   const playersData = gameConfig.players;
-  const currentPlayerIndex = 0; // Ajustez selon votre logique de tour
-  const currentTurn = 1; // Statique pour cet exemple
 
+  // Initialiser le moteur de jeu dès que les joueurs sont disponibles
+  useEffect(() => {
+    engineRef.current = new GameEngine(playersData);
+  }, [playersData]);
+
+  // Chargement des decks depuis l'API
   useEffect(() => {
     async function loadDecks() {
       const response = await fetch('/api/decks');
@@ -36,11 +45,13 @@ const GameContent = () => {
     loadDecks();
   }, []);
 
-  if (loading) {
+  if (loading || !engineRef.current) {
     return <div>Chargement des decks...</div>;
   }
 
-  const currentPlayer = playersData[currentPlayerIndex];
+  const currentPlayer = engineRef.current.getCurrentPlayer();
+  const currentTurn = engineRef.current.currentTurn;
+  const currentPlayerIndex = engineRef.current.currentPlayerIndex;
 
   const handleHandCardClick = (id) => {
     console.log(`Carte de main ${id} cliquée`);
@@ -61,6 +72,10 @@ const GameContent = () => {
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
+    // Actualiser le moteur
+    engineRef.current.nextTurn();
+    // Forcer le re-render en incrémentant un compteur
+    setUpdateCounter(prev => prev + 1);
   };
 
   return (
