@@ -5,8 +5,18 @@ import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import { Player } from '../models/Player'; // Import du modèle Player
 import styles from './page.module.css';
+//import { useGame } from '../context/GameContext';
 
+/**
+ * HomePageConfig est un composant qui permet de configurer la partie de
+ * Citadelles avant de lancer le jeu. Il permet de choisir le nombre de joueurs
+ * et de saisir les informations de chaque joueur (nom et date de naissance).
+ *
+ * @returns {JSX.Element} Un JSX.Element représentant le formulaire de
+ * configuration de la partie.
+ */
 const HomePageConfig = () => {
+  //const { gameConfig, updateGameConfig } = useGame();
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
@@ -22,6 +32,14 @@ const HomePageConfig = () => {
     setOldestPlayerIndex(null);
   }, [numberOfPlayers]);
 
+  /**
+   * Met à jour les informations d'un joueur en fonction de son index et
+   * du champ modifié.
+   *
+   * @param {number} index - L'index du joueur à modifier
+   * @param {string} field - Le nom du champ à modifier (nom ou birthDate)
+   * @param {any} value - La nouvelle valeur du champ
+   */
   const handlePlayerChange = (index, field, value) => {
     const updatedPlayers = [...players];
     updatedPlayers[index][field] = value;
@@ -48,10 +66,27 @@ const HomePageConfig = () => {
     setPlayers(updatedPlayers);
   };
 
+  /**
+   * Vérifie si le formulaire de configuration de la partie est valide.
+   *
+   * Le formulaire est valide si tous les champs (nom et date de naissance)
+   * sont renseignés pour chaque joueur.
+   *
+   * @returns {boolean} true si le formulaire est valide, false sinon
+   */
   const validateForm = () => {
     return players.every(player => player.name) && oldestPlayerIndex !== null;
   };
 
+  /**
+   * Gère la soumission du formulaire de configuration de la partie.
+   *
+   * Vérifie si le formulaire est valide, et si c'est le cas, logue les
+   * informations de configuration de la partie dans la console et affiche
+   * un message indiquant que la partie a été lancée.
+   *
+   * @param {Event} e - L'événement de soumission du formulaire
+   */
   const handleLaunchGame = (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -97,7 +132,7 @@ const HomePageConfig = () => {
                 player={player}
                 onChange={handlePlayerChange}
                 onSelectOldest={handleOldestPlayerSelection}
-                isOldest={index === oldestPlayerIndex}
+                isOldest={index === oldestPlayerIndex} // Passez isOldest ici
               />
             ))}
           </div>
@@ -113,7 +148,20 @@ const HomePageConfig = () => {
   );
 };
 
-const PlayerInputRow = ({ index, player, onChange, onSelectOldest, isOldest }) => (
+/**
+ * Composant qui permet de saisir les informations d'un joueur (nom et date
+ * de naissance) dans le formulaire de configuration de la partie.
+ *
+ * @param {number} index - L'index du joueur
+ * @param {object} player - L'objet contenant les informations du joueur
+ * @param {function(number, string, any)} onChange - La fonction qui sera
+ * appelée pour mettre à jour les informations du joueur
+ * @param {boolean} isOldest - Indique si le joueur est le plus âgé
+ * @param {function(number)} onSelectOldest - Fonction appelée pour sélectionner le joueur le plus âgé
+ * @returns {JSX.Element} Un JSX.Element représentant le formulaire pour un
+ * joueur
+ */
+const PlayerInputRow = ({ index, player, onChange, isOldest, onSelectOldest }) => (
   <div className={styles.playerRow}>
     <h3>Joueur {index + 1}</h3>
     <div className={styles.inputGroup}>
