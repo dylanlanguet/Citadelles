@@ -3,15 +3,15 @@ export class GameEngine {
     this.players = players; // Tableau d'instances de Player
     this.currentTurn = 1;   // Numéro du tour courant
     this.currentPlayerIndex = 0; // Index du joueur actif
+    this.currentRoleAction = 1; // Index du joueur actif
     this.phase = 'characterSelection'; // Phase initiale
   }
-
+  
   // Passe au tour suivant dans la phase d'action
   nextTurn() {
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-    this.currentTurn++;
+    this.currentRoleAction++;
   }
-
+  
   // Permet de changer de phase : de la sélection de personnages à la phase d'action
   nextPhase() {
     if (this.phase === 'characterSelection') {
