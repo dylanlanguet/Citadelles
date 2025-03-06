@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import { Player } from '../models/Player';
 import { useGame } from './context/gameContext';
+import { Deck } from '../models/Deck';
 import styles from './page.module.css';
 
 const HomePageConfig = () => {
@@ -51,18 +52,28 @@ const HomePageConfig = () => {
     return players.every(player => player.name.trim() !== '') && oldestPlayerIndex !== null;
   };
 
-  const handleLaunchGame = (e) => {
+  const handleLaunchGame = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       alert('Veuillez remplir tous les champs et sélectionner le joueur le plus âgé.');
       return;
     }
+  
+    // 🔹 Charger et mélanger le deck avant de lancer la partie
+    const deck = await Deck.initializeDeck();
+    if (!deck) {
+      alert('❌ Erreur lors de l’initialisation du deck. Vérifiez votre connexion.');
+      return;
+    }
+  
     updateGameConfig({
       numberOfPlayers,
       players,
+      deck, // 🔹 Ajoute le deck à la config du jeu
     });
-    console.log('Configuration de la partie:', { numberOfPlayers, players });
-    router.push('/game');
+  
+    console.log('✅ Partie prête avec deck :', deck.cards.length, 'cartes.');
+    router.push('/game'); // 🔹 Passe à la page de jeu
   };
 
   return (
