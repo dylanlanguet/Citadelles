@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation'; // Import du hook pour la navigation
 import styles from './page.module.css';
-import { useGame } from '../context/GameContext';
+//import { useGame } from '../context/GameContext';
 
 /**
  * HomePageConfig est un composant qui permet de configurer la partie de
@@ -15,7 +15,7 @@ import { useGame } from '../context/GameContext';
  * configuration de la partie.
  */
 const HomePageConfig = () => {
-  const { gameConfig, updateGameConfig } = useGame();
+  //const { gameConfig, updateGameConfig } = useGame();
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
@@ -76,11 +76,11 @@ const HomePageConfig = () => {
 
   /**
    * Gère la soumission du formulaire de configuration de la partie.
-   * 
+   *
    * Vérifie si le formulaire est valide, et si c'est le cas, logue les
    * informations de configuration de la partie dans la console et affiche
    * un message indiquant que la partie a été lancée.
-   * 
+   *
    * @param {Event} e - L'événement de soumission du formulaire
    */
   const handleLaunchGame = (e) => {
@@ -115,7 +115,6 @@ const HomePageConfig = () => {
               className={styles.select}
             >
               {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
-              {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
                 <option key={num} value={num}>
                   {num} joueurs
                 </option>
@@ -130,7 +129,7 @@ const HomePageConfig = () => {
                 player={player}
                 onChange={handlePlayerChange}
                 onSelectOldest={handleOldestPlayerSelection}
-                isOldest={index === oldestPlayerIndex}
+                isOldest={index === oldestPlayerIndex} // Passez isOldest ici
               />
             ))}
           </div>
@@ -154,10 +153,12 @@ const HomePageConfig = () => {
  * @param {object} player - L'objet contenant les informations du joueur
  * @param {function(number, string, any)} onChange - La fonction qui sera
  * appelée pour mettre à jour les informations du joueur
+ * @param {boolean} isOldest - Indique si le joueur est le plus âgé
+ * @param {function(number)} onSelectOldest - Fonction appelée pour sélectionner le joueur le plus âgé
  * @returns {JSX.Element} Un JSX.Element représentant le formulaire pour un
  * joueur
  */
-const PlayerInputRow = ({ index, player, onChange }) => (
+const PlayerInputRow = ({ index, player, onChange, isOldest, onSelectOldest }) => (
   <div className={styles.playerRow}>
     <h3>Joueur {index + 1}</h3>
     <div className={styles.inputGroup}>
