@@ -9,7 +9,11 @@ export class GameEngine {
  
   // Passe au joueur suivant
   nextTurn() {
-    this.currentRoleAction++;
+    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+    // Incrémente le tour si on revient au premier joueur
+    if (this.currentPlayerIndex === 0) {
+      this.currentTurn++;
+    }
   }
 
   // Vérifie si tous les joueurs ont sélectionné leur personnage
