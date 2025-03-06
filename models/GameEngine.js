@@ -5,7 +5,7 @@ export class GameEngine {
     this.currentPlayerIndex = 0; // Index du joueur dont c'est le tour
     this.phase = 'characterSelection'; // Phase initiale : sélection de personnages
   }
-
+ 
   // Passe au joueur suivant
   nextTurn() {
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;

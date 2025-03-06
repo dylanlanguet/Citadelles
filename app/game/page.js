@@ -9,7 +9,7 @@ import PlayerCarousel from '../components/PlayerCarousel';
 import CharacterSelectionPanel from '../components/CharacterSelectionPanel';
 import { useGame } from '../context/gameContext';
 import { GameEngine } from '../../models/GameEngine';
-import { CharacterCard } from '../../models/characterCard';
+import { CharacterCard } from '../../models/characterCn t ard';
 import styles from './game.module.css';
 
 const GameContent = () => {
