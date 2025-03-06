@@ -7,6 +7,7 @@ import CardView from '../components/cardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
 import { GameProvider } from '../context/gameContext';
+import defaultGameConfig from '../context/gameContext';
 import styles from './game.module.css';
 
 const GameContent = () => {
@@ -15,12 +16,7 @@ const GameContent = () => {
   const [loading, setLoading] = useState(true);
 
   // Exemple de données simulées pour les joueurs
-  const playersData = [
-    { id: 1, name: 'Alice', role: 'Roi', gold: 5, points: 10 },
-    { id: 2, name: 'Bob', role: 'Marchand', gold: 7, points: 12 },
-    { id: 3, name: 'Charlie', role: 'Condottière', gold: 3, points: 9 },
-    { id: 4, name: 'David', role: 'Évêque', gold: 6, points: 15 },
-  ];
+  const playersData = defaultGameConfig;
 
   const [selectedHandCard, setSelectedHandCard] = useState(null);
   const [currentPlayerIndex] = useState(0);

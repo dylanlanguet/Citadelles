@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import CardView from '../components/cardView';
+import CardView from './cardView';
 import styles from './citySection.module.css';
 
 const CitySection = ({ cityDistrictsData }) => {
