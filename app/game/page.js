@@ -6,49 +6,90 @@ import CitySection from '../components/citySection';
 import CardView from '../components/cardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
+import CharacterSelectionPanel from '../components/CharacterSelectionPanel';
 import { useGame } from '../context/gameContext';
 import { GameEngine } from '../../models/GameEngine';
+import { CharacterCard } from '../../models/characterCard';
 import styles from './game.module.css';
 
 const GameContent = () => {
-  const { gameConfig } = useGame();
+  const { gameConfig, updateGameConfig } = useGame();
   const [districtDeck, setDistrictDeck] = useState([]);
   const [characterDeck, setCharacterDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [updateCounter, setUpdateCounter] = useState(0); // state pour forcer le re-render
+  const [updateCounter, setUpdateCounter] = useState(0); // pour forcer un re-render
+  const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
-  // Utiliser une ref pour stocker l'instance du moteur
+  // Utiliser une ref pour stocker l'instance du moteur de jeu
   const engineRef = useRef(null);
 
-  // Vérifier que la configuration est bien chargée
   if (!gameConfig.players || gameConfig.players.length === 0) {
     return <div>Chargement de la configuration...</div>;
   }
-
   const playersData = gameConfig.players;
 
-  // Initialiser le moteur de jeu dès que les joueurs sont disponibles
+  // Initialiser le moteur de jeu une seule fois (au montage)
   useEffect(() => {
-    engineRef.current = new GameEngine(playersData);
-  }, [playersData]);
+    if (!engineRef.current && playersData.length > 0) {
+      engineRef.current = new GameEngine(playersData);
+    }
+  }, []); // <- Ne dépend plus de playersData
 
-  // Chargement des decks depuis l'API
+  // Charger les decks depuis l'API et transformer les characterCards
   useEffect(() => {
     async function loadDecks() {
       const response = await fetch('/api/decks');
       const data = await response.json();
       setDistrictDeck(data.districtDeck);
       setCharacterDeck(data.characterDeck);
+      // Transformer raw characterDeck en instances de CharacterCard
+      const chars = data.characterDeck.map(cardData =>
+        new CharacterCard(
+          cardData.id,
+          cardData.title,
+          cardData.content,
+          cardData.type,
+          cardData.power
+        )
+      );
+      setAvailableCharacterCards(chars);
       setLoading(false);
     }
     loadDecks();
   }, []);
 
   if (loading || !engineRef.current) {
-    return <div>Chargement des decks...</div>;
+    return <div>Chargement...</div>;
   }
 
+  // Filtrer les cartes disponibles pour exclure celles déjà sélectionnées par un joueur
+  const filteredAvailableCards = availableCharacterCards.filter(card =>
+    !playersData.some(player => player.selectedCharacter && player.selectedCharacter.id === card.id)
+  );
+
+  // Si la phase est "characterSelection", afficher l'overlay de sélection
+  if (engineRef.current.phase === 'characterSelection') {
+    return (
+      <div className={styles.container}>
+        <Head>
+          <title>Citadelles - Sélection de personnage</title>
+        </Head>
+        <CharacterSelectionPanel
+          availableCards={filteredAvailableCards}
+          gameEngine={engineRef.current}
+          onSelectionComplete={() => {
+            // Forcer le re-render pour afficher la phase d'action
+            setUpdateCounter(prev => prev + 1);
+          }}
+          gameConfig={gameConfig}
+          updateGameConfig={updateGameConfig}
+        />
+      </div>
+    );
+  }
+
+  // Sinon, phase d'action : afficher l'interface complète du jeu
   const currentPlayer = engineRef.current.getCurrentPlayer();
   const currentTurn = engineRef.current.currentTurn;
   const currentPlayerIndex = engineRef.current.currentPlayerIndex;
@@ -72,10 +113,9 @@ const GameContent = () => {
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
-    // Actualiser le moteur
     engineRef.current.nextTurn();
-    // Forcer le re-render en incrémentant un compteur
     setUpdateCounter(prev => prev + 1);
+    // Vous pouvez recharger la phase de sélection si nécessaire ici
   };
 
   return (
@@ -84,7 +124,6 @@ const GameContent = () => {
         <title>Citadelles - Partie en cours</title>
         <meta name="description" content="Affichage de la partie en cours" />
       </Head>
-
       <nav className={styles.navbar}>
         <div className={styles.turnInfo}>
           <span className={styles.turnNumber}>🕰️ Tour {currentTurn}</span>
@@ -99,21 +138,16 @@ const GameContent = () => {
           <span className={styles.points}>🏅 {currentPlayer.points}</span>
         </div>
       </nav>
-
       <div className={styles.carouselWrapper}>
         <PlayerCarousel players={playersData} currentPlayerIndex={currentPlayerIndex} />
       </div>
-
       <main className={styles.main}>
         <section className={styles.gameInfo}>
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
         </section>
-
         <CitySection cityDistrictsData={districtDeck} />
-
         <hr className={styles.separator} />
-
         <section className={styles.handSection}>
           <h2>Votre main</h2>
           <div className={styles.handContainer}>
@@ -127,9 +161,7 @@ const GameContent = () => {
             ))}
           </div>
         </section>
-
         <hr className={styles.separator} />
-
         <div className={styles.bottomContainer}>
           <aside className={styles.actionsContainer}>
             <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
@@ -139,7 +171,6 @@ const GameContent = () => {
           </aside>
         </div>
       </main>
-
       <footer className={styles.footer}>
         <p>© 2025 Citadelles Project</p>
       </footer>
