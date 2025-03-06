@@ -3,29 +3,28 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import CitySection from '../components/citySection';
-import CardView from '../components/cardView';
+import CardView from '../components/CardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
-import { GameProvider } from '../context/gameContext';
-import defaultGameConfig from '../context/gameContext';
+import { useGame } from '../context/gameContext';
 import styles from './game.module.css';
 
 const GameContent = () => {
+  const { gameConfig } = useGame();
   const [districtDeck, setDistrictDeck] = useState([]);
   const [characterDeck, setCharacterDeck] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Exemple de données simulées pour les joueurs
-  const playersData = defaultGameConfig;
-
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [currentPlayerIndex] = useState(0);
-  const [currentTurn] = useState(1);
 
-  // Pour le moment, on utilisera le districtDeck pour afficher les BuildingCards
-  // et éventuellement le characterDeck pour le choix des personnages.
+  // Vérifier que la configuration est disponible
+  if (!gameConfig.players || gameConfig.players.length === 0) {
+    return <div>Chargement de la configuration...</div>;
+  }
 
-  // Chargement des decks depuis l'API
+  const playersData = gameConfig.players;
+  const currentPlayerIndex = 0; // Ajustez selon votre logique de tour
+  const currentTurn = 1; // Statique pour cet exemple
+
   useEffect(() => {
     async function loadDecks() {
       const response = await fetch('/api/decks');
@@ -48,7 +47,6 @@ const GameContent = () => {
     setSelectedHandCard(id);
   };
 
-  // Gestionnaires pour les actions
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
   };
@@ -73,7 +71,6 @@ const GameContent = () => {
       </Head>
 
       <nav className={styles.navbar}>
-        {/* Informations du tour et du joueur */}
         <div className={styles.turnInfo}>
           <span className={styles.turnNumber}>🕰️ Tour {currentTurn}</span>
         </div>
@@ -88,28 +85,23 @@ const GameContent = () => {
         </div>
       </nav>
 
-      {/* Carousel des joueurs */}
       <div className={styles.carouselWrapper}>
         <PlayerCarousel players={playersData} currentPlayerIndex={currentPlayerIndex} />
       </div>
 
       <main className={styles.main}>
-        {/* Section d'informations de la partie */}
         <section className={styles.gameInfo}>
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
         </section>
 
-        {/* Section de la cité */}
         <CitySection cityDistrictsData={districtDeck} />
 
         <hr className={styles.separator} />
 
-        {/* Section de la main du joueur */}
         <section className={styles.handSection}>
           <h2>Votre main</h2>
           <div className={styles.handContainer}>
-            {/* Ici tu peux choisir d’afficher par exemple les 4 premières cartes du districtDeck */}
             {districtDeck.slice(0, 4).map((card) => (
               <CardView
                 key={card.id}
@@ -123,7 +115,6 @@ const GameContent = () => {
 
         <hr className={styles.separator} />
 
-        {/* Section des boutons d'action */}
         <div className={styles.bottomContainer}>
           <aside className={styles.actionsContainer}>
             <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
@@ -142,11 +133,7 @@ const GameContent = () => {
 };
 
 const GamePage = () => {
-  return (
-    <GameProvider>
-      <GameContent />
-    </GameProvider>
-  );
+  return <GameContent />;
 };
 
 export default GamePage;

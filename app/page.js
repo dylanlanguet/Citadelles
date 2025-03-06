@@ -3,42 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
-import { Player } from '../models/Player'; // Import du modèle Player
+import { Player } from '../models/Player';
+import { useGame } from './context/gameContext';
 import styles from './page.module.css';
 
-/**
- * HomePageConfig est un composant qui permet de configurer la partie de
- * Citadelles avant de lancer le jeu. Il permet de choisir le nombre de joueurs
- * et de saisir les informations de chaque joueur (nom et date de naissance).
- *
- * @returns {JSX.Element} Un JSX.Element représentant le formulaire de
- * configuration de la partie.
- */
 const HomePageConfig = () => {
-
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
   const router = useRouter();
+  const { updateGameConfig } = useGame();
 
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      // Création d'une instance de Player avec nom vide, et isOldest false par défaut
       newPlayers.push(new Player('', ''));
     }
     setPlayers(newPlayers);
     setOldestPlayerIndex(null);
   }, [numberOfPlayers]);
 
-  /**
-   * Met à jour les informations d'un joueur en fonction de son index et
-   * du champ modifié.
-   *
-   * @param {number} index - L'index du joueur à modifier
-   * @param {string} field - Le nom du champ à modifier (nom ou birthDate)
-   * @param {any} value - La nouvelle valeur du champ
-   */
   const handlePlayerChange = (index, field, value) => {
     const updatedPlayers = [...players];
     updatedPlayers[index][field] = value;
@@ -48,64 +32,37 @@ const HomePageConfig = () => {
   const handleOldestPlayerSelection = (index) => {
     let updatedPlayers = [...players];
     if (oldestPlayerIndex === index) {
-      // Désélectionner
       setOldestPlayerIndex(null);
       updatedPlayers = updatedPlayers.map(player => {
         player.isOldest = false;
         return player;
       });
     } else {
-      // Sélectionner le joueur choisi comme le plus âgé
       setOldestPlayerIndex(index);
       updatedPlayers = updatedPlayers.map((player, i) => {
-        player.isOldest = (i === index);
+        player.isOldest = i === index;
         return player;
       });
     }
     setPlayers(updatedPlayers);
   };
 
-  /**
-   * Vérifie si le formulaire de configuration de la partie est valide.
-   *
-   * Le formulaire est valide si tous les champs (nom et date de naissance)
-   * sont renseignés pour chaque joueur.
-   *
-   * @returns {boolean} true si le formulaire est valide, false sinon
-   */
   const validateForm = () => {
-    return players.every(player => player.name) && oldestPlayerIndex !== null;
+    return players.every(player => player.name.trim() !== '') && oldestPlayerIndex !== null;
   };
 
-  /**
-   * Gère la soumission du formulaire de configuration de la partie.
-   *
-   * Vérifie si le formulaire est valide, et si c'est le cas, logue les
-   * informations de configuration de la partie dans la console et affiche
-   * un message indiquant que la partie a été lancée.
-   *
-   * @param {Event} e - L'événement de soumission du formulaire
-   */
   const handleLaunchGame = (e) => {
     e.preventDefault();
     if (!validateForm()) {
       alert('Veuillez remplir tous les champs et sélectionner le joueur le plus âgé.');
       return;
     }
+    updateGameConfig({
+      numberOfPlayers,
+      players,
+    });
     console.log('Configuration de la partie:', { numberOfPlayers, players });
-
     router.push('/game');
-  };
-
-
-  /**
-   * Exporte les noms des joueurs dans une autre page.
-   *
-   * @todo À implémenter
-   */
-  const handleExport = () => {
-    // Exporter les noms de joueurs dans une autre page
-    const playerNames = players.map((player) => player.name);
   };
 
   return (
@@ -143,7 +100,7 @@ const HomePageConfig = () => {
                 player={player}
                 onChange={handlePlayerChange}
                 onSelectOldest={handleOldestPlayerSelection}
-                isOldest={index === oldestPlayerIndex} // Passez isOldest ici
+                isOldest={index === oldestPlayerIndex}
               />
             ))}
           </div>
@@ -159,19 +116,6 @@ const HomePageConfig = () => {
   );
 };
 
-/**
- * Composant qui permet de saisir les informations d'un joueur (nom et date
- * de naissance) dans le formulaire de configuration de la partie.
- *
- * @param {number} index - L'index du joueur
- * @param {object} player - L'objet contenant les informations du joueur
- * @param {function(number, string, any)} onChange - La fonction qui sera
- * appelée pour mettre à jour les informations du joueur
- * @param {boolean} isOldest - Indique si le joueur est le plus âgé
- * @param {function(number)} onSelectOldest - Fonction appelée pour sélectionner le joueur le plus âgé
- * @returns {JSX.Element} Un JSX.Element représentant le formulaire pour un
- * joueur
- */
 const PlayerInputRow = ({ index, player, onChange, isOldest, onSelectOldest }) => (
   <div className={styles.playerRow}>
     <h3>Joueur {index + 1}</h3>

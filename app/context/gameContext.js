@@ -1,37 +1,22 @@
-// app/context/gameContext.js
 'use client';
 
-import { createContext, useContext } from 'react';
-import HomePageConfig from '../page';
+import { createContext, useContext, useState } from 'react';
 
-const players = HomePageConfig.players;
-
-console.log("players:", players);
-
-
-const GameContext = createContext({
-  gameConfig: defaultGameConfig,
-  updateGameConfig: () => { },
-});
+const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-  
-  const updateGameConfig = (newConfig) => {
-    console.log("dummy updateGameConfig called with:", newConfig);
-  };
-  
-  const defaultGameConfig = {
+  const [gameConfig, setGameConfig] = useState({
     numberOfPlayers: 4,
-    players: [
-      { id: 1, name: 'Alice', role: 'Roi', gold: 5, points: 10 },
-      { id: 2, name: 'Bob', role: 'Marchand', gold: 7, points: 12 },
-      { id: 3, name: 'Charlie', role: 'Condottière', gold: 3, points: 9 },
-      { id: 4, name: 'David', role: 'Évêque', gold: 6, points: 15 },
-    ],
+    players: [],
+    // Vous pouvez ajouter d'autres propriétés ici (deck, tour, etc.)
+  });
+
+  const updateGameConfig = (newConfig) => {
+    setGameConfig(newConfig);
   };
-  
+
   return (
-    <GameContext.Provider value={{ gameConfig: GameContext, updateGameConfig }}>
+    <GameContext.Provider value={{ gameConfig, updateGameConfig }}>
       {children}
     </GameContext.Provider>
   );
