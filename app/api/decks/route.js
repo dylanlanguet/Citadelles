@@ -6,6 +6,7 @@ export async function GET(request) {
   
   // Récupérer toutes les BuildingCards (districts)
   const districtDeck = await db.all("SELECT * FROM BuildingCards;");
+  console.log(districtDeck)
   // Récupérer toutes les CharacterCards
   const characterDeck = await db.all("SELECT * FROM CharacterCards;");
   
