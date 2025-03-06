@@ -5,7 +5,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import { Player } from '../models/Player'; // Import du modèle Player
 import styles from './page.module.css';
-//import { useGame } from '../context/GameContext';
 
 /**
  * HomePageConfig est un composant qui permet de configurer la partie de
@@ -16,7 +15,7 @@ import styles from './page.module.css';
  * configuration de la partie.
  */
 const HomePageConfig = () => {
-  //const { gameConfig, updateGameConfig } = useGame();
+
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
@@ -94,7 +93,19 @@ const HomePageConfig = () => {
       return;
     }
     console.log('Configuration de la partie:', { numberOfPlayers, players });
+
     router.push('/game');
+  };
+
+
+  /**
+   * Exporte les noms des joueurs dans une autre page.
+   *
+   * @todo À implémenter
+   */
+  const handleExport = () => {
+    // Exporter les noms de joueurs dans une autre page
+    const playerNames = players.map((player) => player.name);
   };
 
   return (
