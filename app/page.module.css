@@ -1,7 +1,7 @@
 .container {
   min-height: 100vh;
   padding: 0 2rem;
-  background: url('/images/medieval-background.jpg') no-repeat center center fixed;
+  background: url('/BackgroundImage.jpg') no-repeat center center fixed;
   background-size: cover;
   color: #fff;
 }
@@ -50,6 +50,32 @@
   margin-bottom: 0.5rem;
 }
 
+/* ✅ Ajout de styles pour le SELECT */
+.field select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #b8860b;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  cursor: pointer;
+  appearance: none; /* Supprime le style par défaut sur certains navigateurs */
+}
+
+/* ✅ Rendre le texte bien visible dans la liste */
+.field select option {
+  background: #000;
+  color: #fff;
+}
+
+/* ✅ Ajout d'un effet au survol */
+.field select:hover,
+.field select:focus {
+  border-color: #ffd700;
+  outline: none;
+}
+
 .playersList {
   margin-bottom: 1.5rem;
 }
@@ -75,6 +101,19 @@
   padding: 0.5rem;
   border-radius: 4px;
   border: none;
+}
+
+/* ✅ Style des cases à cocher */
+.inputGroup input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/* ✅ Effet sur la checkbox lorsqu'elle est désactivée */
+.inputGroup input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .launchButton {

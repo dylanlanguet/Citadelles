@@ -1,0 +1,25 @@
+/* components/playerCarousel.module.css */
+.carouselContainer {
+    display: flex;
+    overflow-x: auto;
+    padding: 8px;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .playerItem {
+    text-align: center;
+    min-width: 80px;
+  }
+  
+  .active {
+    font-weight: bold;
+    color: blue;
+  }
+  
+  .cursor {
+    margin-top: 4px;
+    font-size: 20px;
+    color: blue;
+  }
+  

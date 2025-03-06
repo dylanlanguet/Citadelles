@@ -1,45 +1,120 @@
+/* ✅ Fond général avec ambiance médiévale */
 .container {
-    min-height: 100vh;
-    background: url('/images/medieval-background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    padding: 2rem;
-    color: #fff;
-  }
-  
-  .header {
-    text-align: center;
-    padding: 1rem 0;
-    text-shadow: 2px 2px 4px #000;
-  }
-  
-  .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2rem 0;
-  }
-  
-  .gameInfo, .gameBoard {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 600px;
-  }
-  
-  .gameInfo ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .gameInfo li {
-    margin-bottom: 0.5rem;
-  }
-  
-  .footer {
-    text-align: center;
-    padding: 1rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
+  min-height: 100vh;
+  background: url('/images/medieval-background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  padding: 2rem;
+  color: #f5e6ca; /* Blanc cassé élégant */
+  font-family: 'Cinzel', serif; /* Police médiévale */
+}
+
+/* ✅ Header stylisé */
+.header {
+  text-align: center;
+  padding: 1rem 0;
+  text-shadow: 2px 2px 4px #000;
+}
+
+/* ✅ Nouvelle navbar inspirée de Citadelles */
+.navbar {
+  width: 100%;
+  background: linear-gradient(to right, #7b3e19, #b8860b); /* Bordeaux vers Or */
+  color: #ffd700; /* Or royal */
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  border-bottom: 3px solid #ffd700; /* Ligne dorée */
+}
+
+/* ✅ Regroupe le nom, le numéro et le rôle sur une seule ligne */
+.playerInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ✅ Nom du joueur en Or */
+.playerName {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #ffd700;
+}
+
+/* ✅ Joueur X reste visible */
+.playerNumber {
+  font-size: 1rem;
+  color: #f5e6ca;
+}
+
+/* ✅ Le rôle reste bien aligné */
+.role {
+  font-style: italic;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ✅ Or et Points bien alignés à droite */
+.stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.gold,
+.points {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffd700;
+}
+
+/* ✅ Contenu du jeu */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+/* ✅ Ajout d'un fond royal aux blocs d'information */
+.gameInfo, .gameBoard {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* ✅ Liste des joueurs plus claire */
+.gameInfo ul {
+  list-style: none;
+  padding: 0;
+}
+
+.gameInfo li {
+  margin-bottom: 0.5rem;
+}
+
+/* ✅ Footer amélioré */
+.footer {
+  text-align: center;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+  margin-top: 2rem;
+}
+
+/* ✅ Cartes bien disposées */
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}

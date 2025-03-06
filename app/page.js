@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation'; // Import du hook pour la navigation
 import styles from './page.module.css';
 import { useGame } from '../context/GameContext';
 
@@ -17,13 +18,16 @@ const HomePageConfig = () => {
   const { gameConfig, updateGameConfig } = useGame();
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
+  const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
+  const router = useRouter(); // Initialisation du router
 
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      newPlayers.push({ name: '', birthDate: '' });
+      newPlayers.push({ name: '', isOldest: false });
     }
     setPlayers(newPlayers);
+    setOldestPlayerIndex(null);
   }, [numberOfPlayers]);
 
   /**
@@ -40,6 +44,24 @@ const HomePageConfig = () => {
     setPlayers(updatedPlayers);
   };
 
+  const handleOldestPlayerSelection = (index) => {
+    if (oldestPlayerIndex === index) {
+      setOldestPlayerIndex(null);
+      const updatedPlayers = players.map((player) => ({
+        ...player,
+        isOldest: false,
+      }));
+      setPlayers(updatedPlayers);
+    } else {
+      setOldestPlayerIndex(index);
+      const updatedPlayers = players.map((player, i) => ({
+        ...player,
+        isOldest: i === index,
+      }));
+      setPlayers(updatedPlayers);
+    }
+  };
+
   /**
    * Vérifie si le formulaire de configuration de la partie est valide.
    *
@@ -49,7 +71,7 @@ const HomePageConfig = () => {
    * @returns {boolean} true si le formulaire est valide, false sinon
    */
   const validateForm = () => {
-    return players.every(player => player.name && player.birthDate);
+    return players.every((player) => player.name) && oldestPlayerIndex !== null;
   };
 
   /**
@@ -64,12 +86,12 @@ const HomePageConfig = () => {
   const handleLaunchGame = (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      alert('Veuillez remplir tous les champs pour chaque joueur.');
+      alert('Veuillez remplir tous les champs et sélectionner un joueur le plus âgé.');
       return;
     }
     console.log('Configuration de la partie:', { numberOfPlayers, players });
-    alert('Partie lancée! (La redirection vers la page de jeu sera implémentée ultérieurement)');
-    // router.push('/game');
+    // Redirection vers la page /game
+    router.push('/game');
   };
 
   return (
@@ -90,7 +112,9 @@ const HomePageConfig = () => {
               id="numberOfPlayers"
               value={numberOfPlayers}
               onChange={(e) => setNumberOfPlayers(parseInt(e.target.value))}
+              className={styles.select}
             >
+              {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
               {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
                 <option key={num} value={num}>
                   {num} joueurs
@@ -105,6 +129,8 @@ const HomePageConfig = () => {
                 index={index}
                 player={player}
                 onChange={handlePlayerChange}
+                onSelectOldest={handleOldestPlayerSelection}
+                isOldest={index === oldestPlayerIndex}
               />
             ))}
           </div>
@@ -145,13 +171,14 @@ const PlayerInputRow = ({ index, player, onChange }) => (
       />
     </div>
     <div className={styles.inputGroup}>
-      <label htmlFor={`player-birth-${index}`}>Date de naissance :</label>
-      <input
-        type="date"
-        id={`player-birth-${index}`}
-        value={player.birthDate}
-        onChange={(e) => onChange(index, 'birthDate', e.target.value)}
-      />
+      <label>
+        <input
+          type="checkbox"
+          checked={isOldest}
+          onChange={() => onSelectOldest(index)}
+        />
+        Joueur le plus âgé
+      </label>
     </div>
   </div>
 );
