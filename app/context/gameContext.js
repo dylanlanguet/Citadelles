@@ -10,7 +10,7 @@ console.log("players:", players);
 
 
 const GameContext = createContext({
-  gameConfig: defaultGameConfig,
+  gameConfig: {}, 
   updateGameConfig: () => { },
 });
 

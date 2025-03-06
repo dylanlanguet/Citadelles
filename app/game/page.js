@@ -7,7 +7,6 @@ import CardView from '../components/cardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
 import { GameProvider } from '../context/gameContext';
-import defaultGameConfig from '../context/gameContext';
 import styles from './game.module.css';
 
 const GameContent = () => {
@@ -16,7 +15,12 @@ const GameContent = () => {
   const [loading, setLoading] = useState(true);
 
   // Exemple de données simulées pour les joueurs
-  const playersData = defaultGameConfig;
+  const playersData = [
+    { name: 'Joueur 1', resources: 10 },
+    { name: 'Joueur 2', resources: 8 },
+    { name: 'Joueur 3', resources: 12 },
+    { name: 'Joueur 4', resources: 9 },
+  ];
 
   const [selectedHandCard, setSelectedHandCard] = useState(null);
   const [currentPlayerIndex] = useState(0);
