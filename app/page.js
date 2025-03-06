@@ -2,19 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/navigation'; // Import du hook pour la navigation
+import { useRouter } from 'next/navigation';
+import { Player } from '../models/Player'; // Import du modèle Player
 import styles from './page.module.css';
 
 const HomePageConfig = () => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
   const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
-  const router = useRouter(); // Initialisation du router
+  const router = useRouter();
 
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      newPlayers.push({ name: '', isOldest: false });
+      // Création d'une instance de Player avec nom vide, birthDate vide et isOldest false par défaut
+      newPlayers.push(new Player('', ''));
     }
     setPlayers(newPlayers);
     setOldestPlayerIndex(null);
@@ -27,35 +29,36 @@ const HomePageConfig = () => {
   };
 
   const handleOldestPlayerSelection = (index) => {
+    let updatedPlayers = [...players];
     if (oldestPlayerIndex === index) {
+      // Désélectionner
       setOldestPlayerIndex(null);
-      const updatedPlayers = players.map((player) => ({
-        ...player,
-        isOldest: false,
-      }));
-      setPlayers(updatedPlayers);
+      updatedPlayers = updatedPlayers.map(player => {
+        player.isOldest = false;
+        return player;
+      });
     } else {
+      // Sélectionner le joueur choisi comme le plus âgé
       setOldestPlayerIndex(index);
-      const updatedPlayers = players.map((player, i) => ({
-        ...player,
-        isOldest: i === index,
-      }));
-      setPlayers(updatedPlayers);
+      updatedPlayers = updatedPlayers.map((player, i) => {
+        player.isOldest = (i === index);
+        return player;
+      });
     }
+    setPlayers(updatedPlayers);
   };
 
   const validateForm = () => {
-    return players.every((player) => player.name) && oldestPlayerIndex !== null;
+    return players.every(player => player.name) && oldestPlayerIndex !== null;
   };
 
   const handleLaunchGame = (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      alert('Veuillez remplir tous les champs et sélectionner un joueur le plus âgé.');
+      alert('Veuillez remplir tous les champs et sélectionner le joueur le plus âgé.');
       return;
     }
     console.log('Configuration de la partie:', { numberOfPlayers, players });
-    // Redirection vers la page /game
     router.push('/game');
   };
 
@@ -79,7 +82,7 @@ const HomePageConfig = () => {
               onChange={(e) => setNumberOfPlayers(parseInt(e.target.value))}
               className={styles.select}
             >
-              {Array.from({ length: 4 }, (_, i) => i + 4).map((num) => (
+              {Array.from({ length: 4 }, (_, i) => i + 4).map(num => (
                 <option key={num} value={num}>
                   {num} joueurs
                 </option>

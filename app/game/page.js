@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import CitySection from '../components/citySection';
-import CardView from '../components/cardView';
+import CardView from '../components/CardView';
 import ActionButton from '../components/actionButton';
 import PlayerCarousel from '../components/PlayerCarousel';
 import { GameProvider } from '../context/gameContext';

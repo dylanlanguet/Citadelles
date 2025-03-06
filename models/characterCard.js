@@ -4,7 +4,7 @@ import { Card } from './card';
 export class CharacterCard extends Card {
   constructor(id, title, content, power) {
     super(id, title, content);
-    this.power = power; // Pouvoir spécifique du personnage
+    this.power = power; // Pouvoir spécifique du personnage a passer a tant que classe ?
   }
 
   play() {
