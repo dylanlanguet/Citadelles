@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <GameProvider>
+        <GameProvider players={[]}>
           {children}
         </GameProvider>
       </body>
