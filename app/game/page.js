@@ -19,7 +19,7 @@ const GameContent = () => {
   const [districtDeck, setDistrictDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [/* updateCounter */, setUpdateCounter] = useState(0); // pour forcer un re-render
+  const [updateCounter, setUpdateCounter] = useState(0); // Pour forcer un re-render
   const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
@@ -38,14 +38,14 @@ const GameContent = () => {
     }
   }, [gameConfig, router]);
 
-  // Initialiser le moteur de jeu une seule fois au montage
+  // Initialiser le moteur de jeu une seule fois
   useEffect(() => {
     if (!engineRef.current && gameConfig.players.length > 0) {
       engineRef.current = new GameEngine(gameConfig.players);
     }
   }, [gameConfig.players]);
 
-  // Charger les decks depuis l'API et transformer les cartes en instances de BuildingCard et CharacterCard
+  // Charger les decks depuis l'API et transformer les cartes en instances
   useEffect(() => {
     async function loadDecks() {
       const response = await fetch('/api/decks');
@@ -80,6 +80,17 @@ const GameContent = () => {
     loadDecks();
   }, []);
 
+  // Une fois les decks chargés, initialiser la main du joueur s'il est vide
+  useEffect(() => {
+    if (!loading && engineRef.current) {
+      const player = engineRef.current.getCurrentPlayer();
+      if (player.hand.length === 0 && districtDeck.length >= 4) {
+        // Pour cet exemple, on pioche les 4 premières BuildingCards pour constituer la main
+        player.hand = districtDeck.slice(0, 4);
+      }
+    }
+  }, [loading, districtDeck]);
+
   if (loading) {
     return <div>Chargement...</div>;
   }
@@ -87,18 +98,30 @@ const GameContent = () => {
     router.push('/');
   }
 
-  // Récupérer le joueur courant et les informations du tour
   const currentPlayer = engineRef.current.getCurrentPlayer();
   const currentTurn = engineRef.current.currentTurn;
   const currentPlayerIndex = engineRef.current.currentPlayerIndex;
 
-  // Gestion de la sélection d'une carte dans la main (ici, on suppose que la main se compose de BuildingCards)
+  // Afficher la main du joueur à partir de currentPlayer.hand
   const handleHandCardClick = (id) => {
     console.log(`Carte de main ${id} cliquée`);
     setSelectedHandCard(id);
   };
 
-  // Actions classiques
+  // Fonction pour piocher une carte depuis le deck et l'ajouter à la main du joueur
+  const handleDrawCards = () => {
+    if (districtDeck.length === 0) {
+      alert("Le deck est vide, vous ne pouvez pas piocher de cartes.");
+      return;
+    }
+    // Ici, nous retirons la dernière carte du deck pour simuler une pioche
+    const drawnCard = districtDeck[districtDeck.length - 1];
+    setDistrictDeck(prev => prev.slice(0, prev.length - 1));
+    currentPlayer.hand.push(drawnCard);
+    console.log(`${currentPlayer.name} a pioché la carte "${drawnCard.title}".`);
+    setUpdateCounter(prev => prev + 1);
+  };
+
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
     currentPlayer.addGold(2);
@@ -111,37 +134,35 @@ const GameContent = () => {
     setUpdateCounter(prev => prev + 1);
   };
 
-  const handleDrawCards = () => {
-    console.log("Action : Piocher des cartes");
-    // Implémentez ici la logique de pioche
-  };
-
   // Gestion pour jouer une BuildingCard (Construire)
   const handlePlayBuildingCard = () => {
     if (!selectedHandCard) {
       alert("Veuillez sélectionner une carte bâtiment de votre main.");
       return;
     }
-    // Chercher la BuildingCard dans le districtDeck (les BuildingCards sont des instances, donc la méthode play() est disponible)
-    const buildingCard = districtDeck.find(card => card.id === selectedHandCard);
+    // Chercher la BuildingCard dans la main du joueur
+    const buildingCard = currentPlayer.hand.find(card => card.id === selectedHandCard);
     if (!buildingCard) {
-      alert("Carte non trouvée.");
+      alert("Carte non trouvée dans votre main.");
       return;
     }
     if (currentPlayer.gold < buildingCard.cost) {
       alert("Vous n'avez pas assez d'or pour construire ce bâtiment.");
       return;
     }
-    // Appeler la méthode play() de la BuildingCard
+    // Jouer la BuildingCard (la méthode play() effectue la logique de construction)
     buildingCard.play();
     // Déduire le coût du bâtiment du joueur
     currentPlayer.removeGold(buildingCard.cost);
-    // Déplacer la BuildingCard de la main vers la cité du joueur
+    // Déplacer la carte de la main vers la cité
     currentPlayer.playCard(buildingCard.id);
+    // Mettre à jour le contexte pour forcer un re-render de la main et de la cité
+    updateGameConfig({ ...gameConfig });
+    // Réinitialiser la sélection
+    setSelectedHandCard(null);
     setUpdateCounter(prev => prev + 1);
   };
 
-  // Gestion du pouvoir (déjà implémenté pour les personnages)
   const handleUsePower = () => {
     if (currentPlayer.selectedCharacter && currentPlayer.selectedCharacter.power) {
       const power = currentPlayer.selectedCharacter.power;
@@ -226,22 +247,24 @@ const GameContent = () => {
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {gameConfig.players.length}</p>
         </section>
-
         {/* Afficher la cité du joueur courant */}
         <CitySection constructedDistricts={currentPlayer.city} />
-
         <hr className={styles.separator} />
         <section className={styles.handSection}>
           <h2>Votre main</h2>
           <div className={styles.handContainer}>
-            {districtDeck.slice(0, 4).map((card) => (
-              <CardView
-                key={card.id}
-                card={card}
-                onClick={() => handleHandCardClick(card.id)}
-                selected={card.id === selectedHandCard}
-              />
-            ))}
+            {currentPlayer.hand && currentPlayer.hand.length > 0 ? (
+              currentPlayer.hand.map((card, idx) => (
+                <CardView
+                  key={`${card.id}-${idx}`}
+                  card={card}
+                  onClick={() => handleHandCardClick(card.id)}
+                  selected={card.id === selectedHandCard}
+                />
+              ))
+            ) : (
+              <p>Votre main est vide.</p>
+            )}
           </div>
         </section>
         <hr className={styles.separator} />
