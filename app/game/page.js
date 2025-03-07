@@ -80,16 +80,24 @@ const GameContent = () => {
     loadDecks();
   }, []);
 
-  // Une fois les decks chargés, initialiser la main du joueur s'il est vide
+  // Distribuer 4 cartes et 2 pièces d'or à tous les joueurs, si ce n'est pas déjà fait
   useEffect(() => {
-    if (!loading && engineRef.current) {
-      const player = engineRef.current.getCurrentPlayer();
-      if (player.hand.length === 0 && districtDeck.length >= 4) {
-        // Pour cet exemple, on pioche les 4 premières BuildingCards pour constituer la main
-        player.hand = districtDeck.slice(0, 4);
-      }
+    if (!loading && districtDeck.length > 0 && !gameConfig.initialized && engineRef.current) {
+      let deckCopy = [...districtDeck];
+      engineRef.current.players.forEach(player => {
+        player.gold = 2;
+        if (deckCopy.length >= 4) {
+          player.hand = deckCopy.splice(0, 4);
+        } else {
+          player.hand = [...deckCopy];
+          deckCopy = [];
+        }
+      });
+      updateGameConfig({ ...gameConfig, initialized: true });
+      setDistrictDeck(deckCopy);
+      setUpdateCounter(prev => prev + 1);
     }
-  }, [loading, districtDeck]);
+  }, [loading, districtDeck, gameConfig, updateGameConfig]);
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -108,20 +116,6 @@ const GameContent = () => {
     setSelectedHandCard(id);
   };
 
-  // Fonction pour piocher une carte depuis le deck et l'ajouter à la main du joueur
-  const handleDrawCards = () => {
-    if (districtDeck.length === 0) {
-      alert("Le deck est vide, vous ne pouvez pas piocher de cartes.");
-      return;
-    }
-    // Ici, nous retirons la dernière carte du deck pour simuler une pioche
-    const drawnCard = districtDeck[districtDeck.length - 1];
-    setDistrictDeck(prev => prev.slice(0, prev.length - 1));
-    currentPlayer.hand.push(drawnCard);
-    console.log(`${currentPlayer.name} a pioché la carte "${drawnCard.title}".`);
-    setUpdateCounter(prev => prev + 1);
-  };
-
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
     currentPlayer.addGold(2);
@@ -134,7 +128,19 @@ const GameContent = () => {
     setUpdateCounter(prev => prev + 1);
   };
 
-  // Gestion pour jouer une BuildingCard (Construire)
+  const handleDrawCards = () => {
+    if (districtDeck.length === 0) {
+      alert("Le deck est vide, vous ne pouvez pas piocher de cartes.");
+      return;
+    }
+    // Retirer la dernière carte du deck pour simuler une pioche
+    const drawnCard = districtDeck[districtDeck.length - 1];
+    setDistrictDeck(prev => prev.slice(0, prev.length - 1));
+    currentPlayer.hand.push(drawnCard);
+    console.log(`${currentPlayer.name} a pioché la carte "${drawnCard.title}".`);
+    setUpdateCounter(prev => prev + 1);
+  };
+
   const handlePlayBuildingCard = () => {
     if (!selectedHandCard) {
       alert("Veuillez sélectionner une carte bâtiment de votre main.");
@@ -150,15 +156,13 @@ const GameContent = () => {
       alert("Vous n'avez pas assez d'or pour construire ce bâtiment.");
       return;
     }
-    // Jouer la BuildingCard (la méthode play() effectue la logique de construction)
+    // Jouer la BuildingCard
     buildingCard.play();
-    // Déduire le coût du bâtiment du joueur
+    // Déduire le coût du bâtiment
     currentPlayer.removeGold(buildingCard.cost);
     // Déplacer la carte de la main vers la cité
     currentPlayer.playCard(buildingCard.id);
-    // Mettre à jour le contexte pour forcer un re-render de la main et de la cité
     updateGameConfig({ ...gameConfig });
-    // Réinitialiser la sélection
     setSelectedHandCard(null);
     setUpdateCounter(prev => prev + 1);
   };
@@ -197,7 +201,6 @@ const GameContent = () => {
     setUpdateCounter(prev => prev + 1);
   };
 
-  // Si la phase est "characterSelection", afficher l'overlay de sélection
   if (engineRef.current.phase === 'characterSelection') {
     return (
       <div className={styles.container}>
@@ -247,7 +250,6 @@ const GameContent = () => {
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {gameConfig.players.length}</p>
         </section>
-        {/* Afficher la cité du joueur courant */}
         <CitySection constructedDistricts={currentPlayer.city} />
         <hr className={styles.separator} />
         <section className={styles.handSection}>
