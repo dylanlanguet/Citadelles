@@ -89,37 +89,6 @@ const GameContent = () => {
     console.log("Action : Piocher des cartes");
   };
 
-<<<<<<< HEAD
-  const handlePlayBuildingCard = () => {
-    if (!selectedHandCard) {
-      alert("Veuillez sélectionner une carte bâtiment de votre main.");
-      return;
-    }
-    // Chercher la carte bâtiment dans le deck
-    const buildingCard = districtDeck.find(card => card.id === selectedHandCard);
-    if (!buildingCard) {
-      alert("Carte non trouvée.");
-      return;
-    }
-    // Vérifier que le joueur a assez d'or
-    if (currentPlayer.gold < buildingCard.cost) {
-      alert("Vous n'avez pas assez d'or pour construire ce bâtiment.");
-      return;
-    }
-    // Jouer la carte bâtiment (affiche un message ou applique des effets)
-    buildingCard.play();
-    // Déduire le coût du joueur
-    currentPlayer.removeGold(buildingCard.cost);
-    // Déplacer la carte de la main vers la cité
-    currentPlayer.playCard(buildingCard.id);
-    // Forcer un re-render pour mettre à jour l'affichage (par exemple, de la cité)
-    setUpdateCounter(prev => prev + 1);
-  };
-  
-
-  // Bouton pour utiliser son pouvoir (déjà implémenté)
-=======
->>>>>>> 623f1e645d9bfecf4d2dff9ab8217ea9749eac1b
   const handleUsePower = () => {
     if (currentPlayer.selectedCharacter && currentPlayer.selectedCharacter.power) {
       const power = currentPlayer.selectedCharacter.power;
@@ -133,20 +102,11 @@ const GameContent = () => {
         if (targetId) {
           currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
         }
-<<<<<<< HEAD
-      } else if (power === 'Échange') {
-        currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer);
-      } else {
-        alert("Pouvoir non implémenté pour ce personnage.");
-      }
-      engineRef.current.nextTurn();
-=======
       } else if (currentPlayer.selectedCharacter.power === 'Échange') {
         alert("Pouvoir d'échange non implémenté pour le moment.");
       } else {
         alert("Pouvoir non implémenté pour ce personnage.");
       }
->>>>>>> 623f1e645d9bfecf4d2dff9ab8217ea9749eac1b
       setUpdateCounter(prev => prev + 1);
     } else {
       alert("Votre personnage n'a pas de pouvoir utilisable.");
