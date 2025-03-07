@@ -3,9 +3,10 @@ export class GameEngine {
     this.players = players; // tableau d'instances de Player
     this.currentTurn = 1;   // Numéro du tour courant
     this.currentPlayerIndex = 0; // Index du joueur dont c'est le tour
+    this.currentRoleAction = 1; // Index du joueur actif
     this.phase = 'characterSelection'; // Phase initiale : sélection de personnages
   }
-
+ 
   // Passe au joueur suivant
   nextTurn() {
     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
