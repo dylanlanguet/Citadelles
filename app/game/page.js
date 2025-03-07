@@ -17,10 +17,10 @@ import styles from './game.module.css';
 const GameContent = () => {
   const { gameConfig, updateGameConfig } = useGame();
   const [districtDeck, setDistrictDeck] = useState([]);
-  const [characterDeck, setCharacterDeck] = useState([]);
+  const [/* characterDeck */, setCharacterDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [updateCounter, setUpdateCounter] = useState(0); // pour forcer un re-render
+  const [/* updateCounter */, setUpdateCounter] = useState(0); // pour forcer un re-render
   const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
@@ -29,8 +29,6 @@ const GameContent = () => {
 
   if (!gameConfig.players || gameConfig.players.length === 0) {
     return router.push('/');
-    updateCounter;
-    characterDeck;
   }
   const playersData = gameConfig.players;
 
@@ -39,7 +37,7 @@ const GameContent = () => {
     if (!engineRef.current && playersData.length > 0) {
       engineRef.current = new GameEngine(playersData);
     }
-  }, []);
+  }, [playersData]);
 
   // Charger les decks depuis l'API et transformer les characterCards
   useEffect(() => {
