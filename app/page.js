@@ -1,19 +1,27 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/navigation';
+import { Player } from '../models/Player';
+import { useGame } from './context/gameContext';
+import { Deck } from '../models/Deck';
 import styles from './page.module.css';
 
 const HomePageConfig = () => {
-  const [numberOfPlayers, setNumberOfPlayers] = useState(2);
+  const [numberOfPlayers, setNumberOfPlayers] = useState(4);
   const [players, setPlayers] = useState([]);
+  const [oldestPlayerIndex, setOldestPlayerIndex] = useState(null);
+  const router = useRouter();
+  const { updateGameConfig } = useGame();
 
   useEffect(() => {
     const newPlayers = [];
     for (let i = 0; i < numberOfPlayers; i++) {
-      newPlayers.push({ name: '', birthDate: '' });
+      newPlayers.push(new Player('', ''));
     }
     setPlayers(newPlayers);
+    setOldestPlayerIndex(null);
   }, [numberOfPlayers]);
 
   const handlePlayerChange = (index, field, value) => {
@@ -22,19 +30,50 @@ const HomePageConfig = () => {
     setPlayers(updatedPlayers);
   };
 
-  const validateForm = () => {
-    return players.every(player => player.name && player.birthDate);
+  const handleOldestPlayerSelection = (index) => {
+    let updatedPlayers = [...players];
+    if (oldestPlayerIndex === index) {
+      setOldestPlayerIndex(null);
+      updatedPlayers = updatedPlayers.map(player => {
+        player.isOldest = false;
+        return player;
+      });
+    } else {
+      setOldestPlayerIndex(index);
+      updatedPlayers = updatedPlayers.map((player, i) => {
+        player.isOldest = i === index;
+        return player;
+      });
+    }
+    setPlayers(updatedPlayers);
   };
 
-  const handleLaunchGame = (e) => {
+  const validateForm = () => {
+    return players.every(player => player.name.trim() !== '') && oldestPlayerIndex !== null;
+  };
+
+  const handleLaunchGame = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      alert('Veuillez remplir tous les champs pour chaque joueur.');
+      alert('Veuillez remplir tous les champs et sélectionner le joueur le plus âgé.');
       return;
     }
-    console.log('Configuration de la partie:', { numberOfPlayers, players });
-    alert('Partie lancée! (La redirection vers la page de jeu sera implémentée ultérieurement)');
-    // router.push('/game');
+  
+    // 🔹 Charger et mélanger le deck avant de lancer la partie
+    const deck = await Deck.initializeDeck();
+    if (!deck) {
+      alert('❌ Erreur lors de l’initialisation du deck. Vérifiez votre connexion.');
+      return;
+    }
+  
+    updateGameConfig({
+      numberOfPlayers,
+      players,
+      deck, // 🔹 Ajoute le deck à la config du jeu
+    });
+  
+    console.log('✅ Partie prête avec deck :', deck.cards.length, 'cartes.');
+    router.push('/game'); // 🔹 Passe à la page de jeu
   };
 
   return (
@@ -55,8 +94,9 @@ const HomePageConfig = () => {
               id="numberOfPlayers"
               value={numberOfPlayers}
               onChange={(e) => setNumberOfPlayers(parseInt(e.target.value))}
+              className={styles.select}
             >
-              {Array.from({ length: 7 }, (_, i) => i + 2).map((num) => (
+              {Array.from({ length: 4 }, (_, i) => i + 4).map(num => (
                 <option key={num} value={num}>
                   {num} joueurs
                 </option>
@@ -70,6 +110,8 @@ const HomePageConfig = () => {
                 index={index}
                 player={player}
                 onChange={handlePlayerChange}
+                onSelectOldest={handleOldestPlayerSelection}
+                isOldest={index === oldestPlayerIndex}
               />
             ))}
           </div>
@@ -85,7 +127,7 @@ const HomePageConfig = () => {
   );
 };
 
-const PlayerInputRow = ({ index, player, onChange }) => (
+const PlayerInputRow = ({ index, player, onChange, isOldest, onSelectOldest }) => (
   <div className={styles.playerRow}>
     <h3>Joueur {index + 1}</h3>
     <div className={styles.inputGroup}>
@@ -99,13 +141,14 @@ const PlayerInputRow = ({ index, player, onChange }) => (
       />
     </div>
     <div className={styles.inputGroup}>
-      <label htmlFor={`player-birth-${index}`}>Date de naissance :</label>
-      <input
-        type="date"
-        id={`player-birth-${index}`}
-        value={player.birthDate}
-        onChange={(e) => onChange(index, 'birthDate', e.target.value)}
-      />
+      <label>
+        <input
+          type="checkbox"
+          checked={isOldest}
+          onChange={() => onSelectOldest(index)}
+        />
+        Joueur le plus âgé
+      </label>
     </div>
   </div>
 );
