@@ -116,39 +116,62 @@ const GameContent = () => {
     // Implémentez la logique de pioche ici
   };
 
-  // Nouveau bouton : utiliser son pouvoir
+  const handlePlayBuildingCard = () => {
+    if (!selectedHandCard) {
+      alert("Veuillez sélectionner une carte bâtiment de votre main.");
+      return;
+    }
+    // Chercher la carte bâtiment dans le deck
+    const buildingCard = districtDeck.find(card => card.id === selectedHandCard);
+    if (!buildingCard) {
+      alert("Carte non trouvée.");
+      return;
+    }
+    // Vérifier que le joueur a assez d'or
+    if (currentPlayer.gold < buildingCard.cost) {
+      alert("Vous n'avez pas assez d'or pour construire ce bâtiment.");
+      return;
+    }
+    // Jouer la carte bâtiment (affiche un message ou applique des effets)
+    buildingCard.play();
+    // Déduire le coût du joueur
+    currentPlayer.removeGold(buildingCard.cost);
+    // Déplacer la carte de la main vers la cité
+    currentPlayer.playCard(buildingCard.id);
+    // Forcer un re-render pour mettre à jour l'affichage (par exemple, de la cité)
+    setUpdateCounter(prev => prev + 1);
+  };
+  
+
+  // Bouton pour utiliser son pouvoir (déjà implémenté)
   const handleUsePower = () => {
-    // Vérifier que le joueur courant a un personnage avec un pouvoir
     if (currentPlayer.selectedCharacter && currentPlayer.selectedCharacter.power) {
-      if (currentPlayer.selectedCharacter.power === 'Élimination') {
+      const power = currentPlayer.selectedCharacter.power;
+      if (power === 'Élimination') {
         const targetId = prompt("Entrez l'ID du personnage à éliminer:");
         if (targetId) {
           currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
         }
-      } else if (currentPlayer.selectedCharacter.power === 'Vol') {
+      } else if (power === 'Vol') {
         const targetId = prompt("Entrez l'ID du personnage dont vous voulez voler l'or:");
         if (targetId) {
           currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
         }
-      } else if (currentPlayer.selectedCharacter.power === 'Échange') {
-        // Implémenter la logique pour l'échange, par exemple via une interface dédiée
-        alert("Pouvoir d'échange non implémenté pour le moment.");
+      } else if (power === 'Échange') {
+        currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer);
       } else {
         alert("Pouvoir non implémenté pour ce personnage.");
       }
-      // Après activation, passer au joueur suivant
-      
+      engineRef.current.nextTurn();
       setUpdateCounter(prev => prev + 1);
     } else {
       alert("Votre personnage n'a pas de pouvoir utilisable.");
     }
   };
-  
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
     engineRef.current.nextTurn();
-    // Si on revient au premier joueur, c'est que tous ont joué pendant ce tour d'action.
     if (engineRef.current.currentPlayerIndex === 0) {
       engineRef.current.endActionPhase();
     }
@@ -183,7 +206,9 @@ const GameContent = () => {
           <h2>Configuration de la partie</h2>
           <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
         </section>
-        <CitySection cityDistrictsData={districtDeck} />
+
+        <CitySection constructedDistricts={currentPlayer.city} />
+
         <hr className={styles.separator} />
         <section className={styles.handSection}>
           <h2>Votre main</h2>
@@ -205,6 +230,7 @@ const GameContent = () => {
             <ActionButton label="Prendre sa dîme" onClick={handleDrawGold} disabled={false} />
             <ActionButton label="Piocher des cartes" onClick={handleDrawCards} disabled={false} />
             <ActionButton label="Utiliser son pouvoir" onClick={handleUsePower} disabled={false} />
+            <ActionButton label="Construire" onClick={handlePlayBuildingCard} disabled={!selectedHandCard} />
             <ActionButton label="Passer son tour" onClick={handlePassTurn} disabled={false} />
           </aside>
         </div>
