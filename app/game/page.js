@@ -19,7 +19,7 @@ const GameContent = () => {
   const [districtDeck, setDistrictDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [/* updateCounter */, setUpdateCounter] = useState(0); // Pour forcer un re-render
+  const [updateCounter, setUpdateCounter] = useState(0); // Pour forcer un re-render
   const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
@@ -92,6 +92,8 @@ const GameContent = () => {
           player.hand = [...deckCopy];
           deckCopy = [];
         }
+        // On réinitialise le flag pour la nouvelle distribution
+        player.resourceActionTaken = false;
       });
       updateGameConfig({ ...gameConfig, initialized: true });
       setDistrictDeck(deckCopy);
@@ -110,37 +112,56 @@ const GameContent = () => {
   const currentTurn = engineRef.current.currentTurn;
   const currentPlayerIndex = engineRef.current.currentPlayerIndex;
 
-  // Afficher la main du joueur à partir de currentPlayer.hand
+  // Gestion de la sélection d'une carte dans la main
   const handleHandCardClick = (id) => {
     console.log(`Carte de main ${id} cliquée`);
     setSelectedHandCard(id);
   };
 
+  // Vérifier si le joueur a déjà pris une action de ressources
+  const resourceActionTaken = currentPlayer.resourceActionTaken;
+
+  // Actions de ressources
   const handleTakeCoins = () => {
+    if (resourceActionTaken) {
+      alert("Vous avez déjà effectué une action de ressources ce tour.");
+      return;
+    }
     console.log("Action : Prendre 2 pièces");
     currentPlayer.addGold(2);
+    currentPlayer.resourceActionTaken = true;
     setUpdateCounter(prev => prev + 1);
   };
 
   const handleDrawGold = () => {
+    if (resourceActionTaken) {
+      alert("Vous avez déjà effectué une action de ressources ce tour.");
+      return;
+    }
     console.log("Action : Piocher de l'or");
     currentPlayer.addGold(1);
+    currentPlayer.resourceActionTaken = true;
     setUpdateCounter(prev => prev + 1);
   };
 
   const handleDrawCards = () => {
+    if (resourceActionTaken) {
+      alert("Vous avez déjà effectué une action de ressources ce tour.");
+      return;
+    }
     if (districtDeck.length === 0) {
       alert("Le deck est vide, vous ne pouvez pas piocher de cartes.");
       return;
     }
-    // Retirer la dernière carte du deck pour simuler une pioche
     const drawnCard = districtDeck[districtDeck.length - 1];
     setDistrictDeck(prev => prev.slice(0, prev.length - 1));
     currentPlayer.hand.push(drawnCard);
+    currentPlayer.resourceActionTaken = true;
     console.log(`${currentPlayer.name} a pioché la carte "${drawnCard.title}".`);
     setUpdateCounter(prev => prev + 1);
   };
 
+  // Jouer une BuildingCard (Construire)
   const handlePlayBuildingCard = () => {
     if (!selectedHandCard) {
       alert("Veuillez sélectionner une carte bâtiment de votre main.");
@@ -156,11 +177,8 @@ const GameContent = () => {
       alert("Vous n'avez pas assez d'or pour construire ce bâtiment.");
       return;
     }
-    // Jouer la BuildingCard
     buildingCard.play();
-    // Déduire le coût du bâtiment
     currentPlayer.removeGold(buildingCard.cost);
-    // Déplacer la carte de la main vers la cité
     currentPlayer.playCard(buildingCard.id);
     updateGameConfig({ ...gameConfig });
     setSelectedHandCard(null);
@@ -195,6 +213,8 @@ const GameContent = () => {
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
     engineRef.current.nextTurn();
+    // Réinitialiser le flag d'action de ressources pour le nouveau joueur
+    engineRef.current.getCurrentPlayer().resourceActionTaken = false;
     if (engineRef.current.currentPlayerIndex === 0) {
       engineRef.current.endActionPhase();
     }
@@ -272,9 +292,9 @@ const GameContent = () => {
         <hr className={styles.separator} />
         <div className={styles.bottomContainer}>
           <aside className={styles.actionsContainer}>
-            <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
-            <ActionButton label="Prendre sa dîme" onClick={handleDrawGold} disabled={false} />
-            <ActionButton label="Piocher des cartes" onClick={handleDrawCards} disabled={false} />
+            <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={resourceActionTaken} />
+            <ActionButton label="Prendre sa dîme" onClick={handleDrawGold} disabled={resourceActionTaken} />
+            <ActionButton label="Piocher des cartes" onClick={handleDrawCards} disabled={resourceActionTaken} />
             <ActionButton label="Utiliser son pouvoir" onClick={handleUsePower} disabled={false} />
             <ActionButton label="Construire" onClick={handlePlayBuildingCard} disabled={!selectedHandCard} />
             <ActionButton label="Passer son tour" onClick={handlePassTurn} disabled={false} />

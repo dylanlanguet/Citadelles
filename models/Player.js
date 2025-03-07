@@ -6,6 +6,7 @@ export class Player {
       this.gold = 0;      // On remplace "resources" par "gold"
       this.hand = [];     // Cartes en main
       this.city = [];     // Quartiers construits dans la cité
+      this.resourceActionTaken = false;
     }
   
     // Ajouter de l'or
