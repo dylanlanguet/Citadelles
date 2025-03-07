@@ -3,34 +3,40 @@ export class GameEngine {
     this.players = players; // tableau d'instances de Player
     this.currentTurn = 1;   // Numéro du tour courant
     this.currentPlayerIndex = 0; // Index du joueur dont c'est le tour
-    this.currentRoleAction = 1; // Index du joueur actif
     this.phase = 'characterSelection'; // Phase initiale : sélection de personnages
   }
- 
-  // Passe au joueur suivant
+
   nextTurn() {
-    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-    // Incrémente le tour si on revient au premier joueur
-    if (this.currentPlayerIndex === 0) {
-      this.currentTurn++;
-    }
+    do {
+      this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+      if (this.currentPlayerIndex === 0) {
+        this.currentTurn++;
+      }
+    } while (this.players[this.currentPlayerIndex].eliminated);
   }
 
-  // Vérifie si tous les joueurs ont sélectionné leur personnage
   allPlayersHaveSelected() {
     return this.players.every(player => player.selectedCharacter);
   }
 
-  // Passe de la phase de sélection à la phase d'action
+  // Ici, on trie les joueurs par l'ID de leur personnage sélectionné avant de passer à l'action
   endSelectionPhase() {
     if (this.allPlayersHaveSelected()) {
+      this.players.sort((a, b) => a.selectedCharacter.id - b.selectedCharacter.id);
       this.phase = 'action';
-      // Optionnellement, remettre l'indice à 0 pour la phase d'action
       this.currentPlayerIndex = 0;
     }
   }
 
-  // Retourne le joueur courant
+  endActionPhase() {
+    this.players.forEach(player => {
+      delete player.selectedCharacter;
+      player.eliminated = false;
+    });
+    this.phase = 'characterSelection';
+    this.currentPlayerIndex = 0;
+  }
+
   getCurrentPlayer() {
     return this.players[this.currentPlayerIndex];
   }

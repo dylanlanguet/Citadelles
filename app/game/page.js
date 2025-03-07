@@ -9,7 +9,7 @@ import PlayerCarousel from '../components/PlayerCarousel';
 import CharacterSelectionPanel from '../components/CharacterSelectionPanel';
 import { useGame } from '../context/gameContext';
 import { GameEngine } from '../../models/GameEngine';
-import { CharacterCard } from '../../models/characterCard';
+ import { CharacterCard } from '../../models/characterCard';
 import styles from './game.module.css';
 
 const GameContent = () => {
@@ -34,7 +34,7 @@ const GameContent = () => {
     if (!engineRef.current && playersData.length > 0) {
       engineRef.current = new GameEngine(playersData);
     }
-  }, []); // <- Ne dépend plus de playersData
+  }, []);
 
   // Charger les decks depuis l'API et transformer les characterCards
   useEffect(() => {
@@ -101,21 +101,58 @@ const GameContent = () => {
 
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
+    currentPlayer.addGold(2);
+    setUpdateCounter(prev => prev + 1);
   };
 
   const handleDrawGold = () => {
     console.log("Action : Piocher de l'or");
+    currentPlayer.addGold(1);
+    setUpdateCounter(prev => prev + 1);
   };
 
   const handleDrawCards = () => {
     console.log("Action : Piocher des cartes");
+    // Implémentez la logique de pioche ici
   };
+
+  // Nouveau bouton : utiliser son pouvoir
+  const handleUsePower = () => {
+    // Vérifier que le joueur courant a un personnage avec un pouvoir
+    if (currentPlayer.selectedCharacter && currentPlayer.selectedCharacter.power) {
+      if (currentPlayer.selectedCharacter.power === 'Élimination') {
+        const targetId = prompt("Entrez l'ID du personnage à éliminer:");
+        if (targetId) {
+          currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
+        }
+      } else if (currentPlayer.selectedCharacter.power === 'Vol') {
+        const targetId = prompt("Entrez l'ID du personnage dont vous voulez voler l'or:");
+        if (targetId) {
+          currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
+        }
+      } else if (currentPlayer.selectedCharacter.power === 'Échange') {
+        // Implémenter la logique pour l'échange, par exemple via une interface dédiée
+        alert("Pouvoir d'échange non implémenté pour le moment.");
+      } else {
+        alert("Pouvoir non implémenté pour ce personnage.");
+      }
+      // Après activation, passer au joueur suivant
+      
+      setUpdateCounter(prev => prev + 1);
+    } else {
+      alert("Votre personnage n'a pas de pouvoir utilisable.");
+    }
+  };
+  
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
     engineRef.current.nextTurn();
+    // Si on revient au premier joueur, c'est que tous ont joué pendant ce tour d'action.
+    if (engineRef.current.currentPlayerIndex === 0) {
+      engineRef.current.endActionPhase();
+    }
     setUpdateCounter(prev => prev + 1);
-    // Vous pouvez recharger la phase de sélection si nécessaire ici
   };
 
   return (
@@ -165,8 +202,9 @@ const GameContent = () => {
         <div className={styles.bottomContainer}>
           <aside className={styles.actionsContainer}>
             <ActionButton label="Prendre 2 pièces" onClick={handleTakeCoins} disabled={false} />
-            <ActionButton label="Piocher de l'or" onClick={handleDrawGold} disabled={false} />
+            <ActionButton label="Prendre sa dîme" onClick={handleDrawGold} disabled={false} />
             <ActionButton label="Piocher des cartes" onClick={handleDrawCards} disabled={false} />
+            <ActionButton label="Utiliser son pouvoir" onClick={handleUsePower} disabled={false} />
             <ActionButton label="Passer son tour" onClick={handlePassTurn} disabled={false} />
           </aside>
         </div>
