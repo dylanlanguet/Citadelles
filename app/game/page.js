@@ -10,7 +10,9 @@ import CharacterSelectionPanel from '../components/CharacterSelectionPanel';
 import { useGame } from '../context/gameContext';
 import { GameEngine } from '../../models/GameEngine';
  import { CharacterCard } from '../../models/characterCard';
+ import { useRouter } from 'next/navigation';
 import styles from './game.module.css';
+
 
 const GameContent = () => {
   const { gameConfig, updateGameConfig } = useGame();
@@ -19,13 +21,14 @@ const GameContent = () => {
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
   const [updateCounter, setUpdateCounter] = useState(0); // pour forcer un re-render
+  const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
   // Utiliser une ref pour stocker l'instance du moteur de jeu
   const engineRef = useRef(null);
 
   if (!gameConfig.players || gameConfig.players.length === 0) {
-    return <div>Chargement de la configuration...</div>;
+    return router.push('/');
   }
   const playersData = gameConfig.players;
 
@@ -38,6 +41,13 @@ const GameContent = () => {
 
   // Charger les decks depuis l'API et transformer les characterCards
   useEffect(() => {
+  /**
+   * Charge les decks de cartes depuis l'API.
+   * Une fois la réponse reçue, les decks sont stockés dans les états districtDeck et characterDeck.
+   * Les cartes du characterDeck sont transformées en instances de CharacterCard.
+   * Les cartes ainsi transformées sont stockées dans l'état availableCharacterCards.
+   * L'état loading est mis à jour pour indiquer que le chargement est terminé.
+   */
     async function loadDecks() {
       const response = await fetch('/api/decks');
       const data = await response.json();
@@ -59,8 +69,10 @@ const GameContent = () => {
     loadDecks();
   }, []);
 
-  if (loading || !engineRef.current) {
+  if (loading) {
     return <div>Chargement...</div>;
+  } else if (!engineRef.current) {
+    router.push('/');
   }
 
   // Filtrer les cartes disponibles pour exclure celles déjà sélectionnées par un joueur
@@ -94,22 +106,40 @@ const GameContent = () => {
   const currentTurn = engineRef.current.currentTurn;
   const currentPlayerIndex = engineRef.current.currentPlayerIndex;
 
+  /**
+   * Gestionnaire d'événement pour la sélection d'une carte de main :
+   * enregistre l'ID de la carte sélectionnée dans l'état local
+   * @param {number} id L'ID de la carte de main cliquée
+   */
   const handleHandCardClick = (id) => {
     console.log(`Carte de main ${id} cliquée`);
     setSelectedHandCard(id);
   };
 
+  /**
+   * Gestionnaire d'événement pour l'action de prendre 2 pièces :
+   * ajoute 2 pièces au joueur courant et force le re-render pour afficher la mise à jour
+   */
   const handleTakeCoins = () => {
     console.log("Action : Prendre 2 pièces");
     currentPlayer.addGold(2);
     setUpdateCounter(prev => prev + 1);
   };
 
+  /**
+   * Gestionnaire d'événement pour l'action de piocher de l'or :
+   * ajoute 1 pièce au joueur courant et force le re-render pour afficher la mise à jour
+   */
   const handleDrawGold = () => {
     console.log("Action : Piocher de l'or");
     currentPlayer.addGold(1);
     setUpdateCounter(prev => prev + 1);
   };
+
+/**
+ * Gestionnaire d'événement pour l'action de piocher des cartes :
+ * affiche un message indiquant l'action et implémente la logique de pioche.
+ */
 
   const handleDrawCards = () => {
     console.log("Action : Piocher des cartes");
@@ -144,6 +174,12 @@ const GameContent = () => {
     }
   };
   
+
+/**
+ * Gestionnaire d'événement pour l'action de passer son tour :
+ * passe le tour au joueur suivant et termine la phase d'action si tous les joueurs ont joué.
+ * @returns {void}
+ */
 
   const handlePassTurn = () => {
     console.log("Action : Passer son tour");
@@ -216,6 +252,10 @@ const GameContent = () => {
   );
 };
 
+/**
+ * Page de jeu principal, affichant les informations de la partie et les actions disponibles
+ * @returns {JSX.Element} Le composant JSX de la page de jeu
+ */
 const GamePage = () => {
   return <GameContent />;
 };
