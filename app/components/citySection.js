@@ -10,7 +10,7 @@ import styles from './citySection.module.css';
  * @param {{ id: number, title: string, content: string }} selectDistrictData Le quartier sélectionné
  * @returns {JSX.Element}
  */
-const CitySection = ({ cityDistrictsData, selectDistrictData }) => {
+const CitySection = ({ cityDistrictsData }) => {
   const [constructedDistricts, setConstructedDistricts] = useState([]); // Variable pour stocker les quartiers construits
   const [selectedCityCard, setSelectedCityCard] = useState(null);
 

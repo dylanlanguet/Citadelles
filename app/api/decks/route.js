@@ -1,7 +1,12 @@
 // app/api/decks/route.js
 import { openDb } from '../../../lib/db';
 
-export async function GET(request) {
+/**
+ * Renvoie le deck de cartes de district et de personnages en format JSON.
+ * @param {import('next/api').NextApiRequest} request
+ * @returns {Promise<import('next/api').NextApiResponse>}
+ */
+export async function GET() {
   const db = await openDb();
   
   // Récupérer toutes les BuildingCards (districts)

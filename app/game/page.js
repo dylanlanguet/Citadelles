@@ -29,6 +29,8 @@ const GameContent = () => {
 
   if (!gameConfig.players || gameConfig.players.length === 0) {
     return router.push('/');
+    updateCounter;
+    characterDeck;
   }
   const playersData = gameConfig.players;
 
