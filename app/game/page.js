@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import CitySection from '../components/citySection';
 import CardView from '../components/cardView';
@@ -9,87 +9,61 @@ import PlayerCarousel from '../components/PlayerCarousel';
 import CharacterSelectionPanel from '../components/CharacterSelectionPanel';
 import { useGame } from '../context/gameContext';
 import { GameEngine } from '../../models/GameEngine';
- import { CharacterCard } from '../../models/characterCard';
+import { CharacterCard } from '../../models/characterCard';
+import { useRouter } from 'next/navigation';
 import styles from './game.module.css';
 
 const GameContent = () => {
   const { gameConfig, updateGameConfig } = useGame();
   const [districtDeck, setDistrictDeck] = useState([]);
-  const [characterDeck, setCharacterDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
   const [updateCounter, setUpdateCounter] = useState(0); // pour forcer un re-render
+  const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
-  // Utiliser une ref pour stocker l'instance du moteur de jeu
   const engineRef = useRef(null);
 
-  if (!gameConfig.players || gameConfig.players.length === 0) {
-    return <div>Chargement de la configuration...</div>;
-  }
-  const playersData = gameConfig.players;
+  const isFirstRender = useRef(true); // Utilisation de useRef pour détecter le premier rendu
 
-  // Initialiser le moteur de jeu une seule fois (au montage)
   useEffect(() => {
-    if (!engineRef.current && playersData.length > 0) {
-      engineRef.current = new GameEngine(playersData);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      // Vérifie si les joueurs sont vides et redirige vers la page principale
+      if (!gameConfig.players || gameConfig.players.length === 0) {
+        console.log('Redirection vers la page principale');
+        router.push('/');
+      }
     }
-  }, []);
+  }, [gameConfig, router]);
 
-  // Charger les decks depuis l'API et transformer les characterCards
+  useEffect(() => {
+    if (!engineRef.current && gameConfig.players.length > 0) {
+      engineRef.current = new GameEngine(gameConfig.players);
+    }
+  }, [gameConfig.players]);
+
   useEffect(() => {
     async function loadDecks() {
       const response = await fetch('/api/decks');
       const data = await response.json();
       setDistrictDeck(data.districtDeck);
-      setCharacterDeck(data.characterDeck);
-      // Transformer raw characterDeck en instances de CharacterCard
-      const chars = data.characterDeck.map(cardData =>
-        new CharacterCard(
-          cardData.id,
-          cardData.title,
-          cardData.content,
-          cardData.type,
-          cardData.power
-        )
-      );
-      setAvailableCharacterCards(chars);
+      setAvailableCharacterCards(data.characterDeck.map(cardData => 
+        new CharacterCard(cardData.id, cardData.title, cardData.content, cardData.type, cardData.power)
+      ));
       setLoading(false);
     }
     loadDecks();
   }, []);
 
-  if (loading || !engineRef.current) {
+  if (loading) {
     return <div>Chargement...</div>;
   }
 
-  // Filtrer les cartes disponibles pour exclure celles déjà sélectionnées par un joueur
-  const filteredAvailableCards = availableCharacterCards.filter(card =>
-    !playersData.some(player => player.selectedCharacter && player.selectedCharacter.id === card.id)
-  );
-
-  // Si la phase est "characterSelection", afficher l'overlay de sélection
-  if (engineRef.current.phase === 'characterSelection') {
-    return (
-      <div className={styles.container}>
-        <Head>
-          <title>Citadelles - Sélection de personnage</title>
-        </Head>
-        <CharacterSelectionPanel
-          availableCards={filteredAvailableCards}
-          gameEngine={engineRef.current}
-          onSelectionComplete={() => {
-            // Forcer le re-render pour afficher la phase d'action
-            setUpdateCounter(prev => prev + 1);
-          }}
-          gameConfig={gameConfig}
-          updateGameConfig={updateGameConfig}
-        />
-      </div>
-    );
+  if (!engineRef.current) {
+    router.push('/');
   }
 
-  // Sinon, phase d'action : afficher l'interface complète du jeu
   const currentPlayer = engineRef.current.getCurrentPlayer();
   const currentTurn = engineRef.current.currentTurn;
   const currentPlayerIndex = engineRef.current.currentPlayerIndex;
@@ -113,9 +87,9 @@ const GameContent = () => {
 
   const handleDrawCards = () => {
     console.log("Action : Piocher des cartes");
-    // Implémentez la logique de pioche ici
   };
 
+<<<<<<< HEAD
   const handlePlayBuildingCard = () => {
     if (!selectedHandCard) {
       alert("Veuillez sélectionner une carte bâtiment de votre main.");
@@ -144,6 +118,8 @@ const GameContent = () => {
   
 
   // Bouton pour utiliser son pouvoir (déjà implémenté)
+=======
+>>>>>>> 623f1e645d9bfecf4d2dff9ab8217ea9749eac1b
   const handleUsePower = () => {
     if (currentPlayer.selectedCharacter && currentPlayer.selectedCharacter.power) {
       const power = currentPlayer.selectedCharacter.power;
@@ -157,12 +133,20 @@ const GameContent = () => {
         if (targetId) {
           currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer, parseInt(targetId));
         }
+<<<<<<< HEAD
       } else if (power === 'Échange') {
         currentPlayer.selectedCharacter.activatePower(engineRef.current, currentPlayer);
       } else {
         alert("Pouvoir non implémenté pour ce personnage.");
       }
       engineRef.current.nextTurn();
+=======
+      } else if (currentPlayer.selectedCharacter.power === 'Échange') {
+        alert("Pouvoir d'échange non implémenté pour le moment.");
+      } else {
+        alert("Pouvoir non implémenté pour ce personnage.");
+      }
+>>>>>>> 623f1e645d9bfecf4d2dff9ab8217ea9749eac1b
       setUpdateCounter(prev => prev + 1);
     } else {
       alert("Votre personnage n'a pas de pouvoir utilisable.");
@@ -199,12 +183,12 @@ const GameContent = () => {
         </div>
       </nav>
       <div className={styles.carouselWrapper}>
-        <PlayerCarousel players={playersData} currentPlayerIndex={currentPlayerIndex} />
+        <PlayerCarousel players={gameConfig.players} currentPlayerIndex={currentPlayerIndex} />
       </div>
       <main className={styles.main}>
         <section className={styles.gameInfo}>
           <h2>Configuration de la partie</h2>
-          <p><strong>Nombre de joueurs :</strong> {playersData.length}</p>
+          <p><strong>Nombre de joueurs :</strong> {gameConfig.players.length}</p>
         </section>
 
         <CitySection constructedDistricts={currentPlayer.city} />
