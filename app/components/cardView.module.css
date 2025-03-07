@@ -71,23 +71,23 @@
 }
 
 /* Couleurs spécifiques pour chaque type */
-.cardType.merveille {
+.cardType.Merveille {
   color: #9b00b3; /* Violet */
 }
 
-.cardType.noble {
+.cardType.Noble {
   color: #f4e03d; /* Jaune */
 }
 
-.cardType.religieux {
+.cardType.Religieux {
   color: #2a66b8; /* Bleu */
 }
 
-.cardType.commercant {
+.cardType.Commercant {
   color: #228b22; /* Vert */
 }
 
-.cardType.condottiere {
+.cardType.Condottiere {
   color: #ff6347; /* Orange */
 }
 

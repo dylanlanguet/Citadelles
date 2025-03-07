@@ -1,10 +1,11 @@
 .citySection {
-    margin-bottom: 24px;
-  }
-  
-  .cityContainer {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  
+  margin-bottom: 24px;
+  overflow: auto;
+}
+
+.cityContainer {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  overflow: auto;
+}

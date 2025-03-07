@@ -19,7 +19,7 @@ const CardView = ({ card, onClick, selected }) => {
     <div className={styles.cardTypeCost}>
       {/* Ajouter des classes conditionnelles selon le type */}
       <p
-        className={`${styles.cardType} ${styles[card.type.toLowerCase()]}`}
+        className={`${styles.cardType} ${styles[card.type]}`}
       >
         {card.type}
       </p>

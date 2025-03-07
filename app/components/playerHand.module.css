@@ -1,7 +1,43 @@
+/* .handContainer : Conteneur principal des cartes */
 .handContainer {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 10px;
-  }
-  
+  display: flex; /* Utilisation de Flexbox pour aligner les cartes horizontalement */
+  flex-wrap: nowrap; /* Empêche les cartes de passer à la ligne suivante */
+  gap: 12px; /* Espacement entre les cartes */
+  overflow-x: auto; /* Permet le défilement horizontal si nécessaire */
+  padding: 10px;
+  justify-content: flex-start; /* Aligner les cartes à gauche */
+  align-items: center; /* Centrer verticalement les cartes */
+  width: 100%; /* Assurez-vous que le conteneur prenne toute la largeur disponible */
+  overflow-y: hidden; /* Empêche le défilement vertical */
+  box-sizing: border-box; /* Assure que le padding est inclus dans la largeur totale */
+}
+
+/* .card : Style de base pour la carte */
+.card {
+  display: flex;
+  flex-direction: column; /* Disposition verticale à l'intérieur de chaque carte */
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  height: 400px; /* Hauteur plus grande */
+  width: 250px; /* Largeur plus petite pour un format portrait */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin-right: 20px; /* Un peu d'espace entre les cartes sur la même ligne */
+  transition: transform 0.2s ease-in-out; /* Effet de transition au survol */
+}
+
+/* Effet de survol */
+.card:hover {
+  transform: translateY(-5px); /* Effet de levée de la carte au survol */
+}
+
+/* .selected : Style lorsque la carte est sélectionnée */
+.selected {
+  color: #000;
+  background-color: #f0f0f0;
+  border-color: #000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
