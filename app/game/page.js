@@ -19,7 +19,7 @@ const GameContent = () => {
   const [districtDeck, setDistrictDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHandCard, setSelectedHandCard] = useState(null);
-  const [updateCounter, setUpdateCounter] = useState(0); // Pour forcer un re-render
+  const [/* updateCounter */, setUpdateCounter] = useState(0); // Pour forcer un re-render
   const router = useRouter();
   const [availableCharacterCards, setAvailableCharacterCards] = useState([]);
 
