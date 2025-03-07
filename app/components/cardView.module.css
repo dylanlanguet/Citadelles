@@ -1,13 +1,117 @@
+/* .card : Style de base pour la carte */
 .card {
-  /* Styles de base pour la carte */
+  display: flex;
+  flex-direction: column; /* Disposition verticale à l'intérieur de chaque carte */
+  justify-content: space-between;
   padding: 10px;
   border: 1px solid #ccc;
   cursor: pointer;
+  height: 400px; /* Hauteur plus grande */
+  width: 250px; /* Largeur plus petite pour un format portrait */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  margin-right: 20px; /* Un peu d'espace entre les cartes sur la même ligne */
+  transition: transform 0.2s ease-in-out; /* Effet de transition au survol */
 }
 
+/* Effet de survol */
+.card:hover {
+  transform: translateY(-5px); /* Effet de levée de la carte au survol */
+}
+
+/* .cardContainer : Conteneur pour les cartes */
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap; /* Permet aux cartes de se répartir sur plusieurs lignes si l'écran est trop petit */
+  justify-content: flex-start; /* Aligner les cartes sur la gauche */
+  gap: 20px; /* Espacement entre les cartes */
+  padding: 20px; /* Espacement autour des cartes */
+  overflow-x: auto; /* Permet de scroller horizontalement si nécessaire */
+}
+
+/* .selected : Style lorsque la carte est sélectionnée */
 .selected {
-  /* Styles lorsque la carte est sélectionnée */
+  color: #000;
   background-color: #f0f0f0;
   border-color: #000;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* .cardHeader : Conteneur pour le titre et le type/cost */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+/* .cardTitle : Titre de la carte */
+.cardTitle {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+}
+
+/* .cardTypeCost : Conteneur pour le type et le coût */
+.cardTypeCost {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* .cardType : Style pour le type de la carte */
+.cardType {
+  font-size: 0.9em;
+  font-style: italic;
+  margin: 0;
+  color: #333; /* Couleur de base */
+}
+
+/* Couleurs spécifiques pour chaque type */
+.cardType.merveille {
+  color: #9b00b3; /* Violet */
+}
+
+.cardType.noble {
+  color: #f4e03d; /* Jaune */
+}
+
+.cardType.religieux {
+  color: #2a66b8; /* Bleu */
+}
+
+.cardType.commercant {
+  color: #228b22; /* Vert */
+}
+
+.cardType.condottiere {
+  color: #ff6347; /* Orange */
+}
+
+/* .cardCost : Coût de la carte */
+.cardCost {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* .cardContent : Contenu de la carte, centré */
+.cardContent {
+  text-align: center;
+  flex-grow: 1;
+  margin-top: 10px;
+  font-size: 1em;
+  color: #555;
+}
+
+/* .cardUtility : Utilité de la carte, justifiée ou centrée */
+.cardUtility {
+  text-align: justify;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #444;
 }
