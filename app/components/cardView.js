@@ -11,12 +11,25 @@ import styles from './cardView.module.css';
 const CardView = ({ card, onClick, selected }) => {
   return (
     <div
-      className={`${styles.card} ${selected ? styles.selected : ''}`}  // Ajouter un style 'selected' si la carte est sélectionnée
-      onClick={onClick}
-    >
-      <h3>{card.title}</h3>
-      <p>{card.content}</p>
+  className={`${styles.card} ${selected ? styles.selected : ''}`}
+  onClick={onClick}
+>
+  <div className={styles.cardHeader}>
+    <h3 className={styles.cardTitle}>{card.title}</h3>
+    <div className={styles.cardTypeCost}>
+      {/* Ajouter des classes conditionnelles selon le type */}
+      <p
+        className={`${styles.cardType} ${styles[card.type.toLowerCase()]}`}
+      >
+        {card.type}
+      </p>
+      <p className={styles.cardCost}>{card.cost}</p>
     </div>
+  </div>
+  <p className={styles.cardContent}>{card.content}</p>
+  <p className={styles.cardUtility}>{card.utility}</p>
+</div>
+
   );
 };
 
