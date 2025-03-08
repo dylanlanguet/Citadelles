@@ -1,3 +1,4 @@
+/* .handContainer : Conteneur principal des cartes */
 .handContainer {
   white-space: nowrap;       /* Empêche le retour à la ligne */
   overflow-x: auto;          /* Active le défilement horizontal */
