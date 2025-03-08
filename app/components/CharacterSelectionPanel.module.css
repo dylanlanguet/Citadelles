@@ -1,16 +1,15 @@
-/* Overlay qui couvre toute la page */
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* fond semi-transparent */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  overflow: auto; /* Permet au contenu de défiler si nécessaire */
+  overflow: auto;
 }
 
 .panel {
@@ -23,25 +22,17 @@
   text-align: center;
 }
 
-.panel h2 {
-  margin-bottom: 10px;
-  font-size: 1.8rem;
-}
-
-.panel p {
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-  color: #333;
-}
-
 .cardsContainer {
-  display: flex;
-  flex-wrap: wrap;
+  /* Utiliser CSS Grid pour 2 colonnes fixes : */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   width: 100%;
-  justify-content: center;
   margin-top: 10px;
-  overflow-x: auto;
+  /* On peut scroller verticalement si trop de cartes */
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .validateButton {
@@ -54,7 +45,6 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
 .validateButton:hover {
   background-color: #005bb5;
 }

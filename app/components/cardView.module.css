@@ -1,24 +1,29 @@
-/* .card : Style de base pour la carte */
 .card {
-  display: flex;
-  flex-direction: column; /* Disposition verticale à l'intérieur de chaque carte */
-  justify-content: space-between;
+  display: inline-block;      /* Passage en inline-block */
+  vertical-align: top;
+  width: 150px;               /* Largeur fixe */
+  height: 225px;              /* Hauteur définie */
   padding: 10px;
   border: 1px solid #ccc;
-  cursor: pointer;
-  height: 400px; /* Hauteur plus grande */
-  width: 250px; /* Largeur plus petite pour un format portrait */
-  background-color: #fff;
   border-radius: 8px;
+  background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  margin-right: 20px; /* Un peu d'espace entre les cartes sur la même ligne */
-  transition: transform 0.2s ease-in-out; /* Effet de transition au survol */
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
 }
 
-/* Effet de survol */
 .card:hover {
-  transform: translateY(-5px); /* Effet de levée de la carte au survol */
+  transform: translateY(-5px);
 }
+
+/* Les autres styles (titres, contenus, etc.) restent inchangés */
+
+
+/* Les autres styles restent inchangés */
+
+
+/* Autres styles restent inchangés... */
+
 
 /* .cardContainer : Conteneur pour les cartes */
 .cardContainer {

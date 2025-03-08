@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Card from '../../models/card'; // Assure-toi que le chemin correspond à l'emplacement de ton composant Card
+import CardView from '../components/cardView';
 import styles from './playerHand.module.css';
 
 const PlayerHand = ({ hand }) => {
@@ -16,18 +16,17 @@ const PlayerHand = ({ hand }) => {
 
   const handleCardClick = (cardId) => {
     setSelectedCardId(cardId);
-    // Ajoute ici la logique que tu souhaites déclencher lors de la sélection (ex. choisir une carte pour construire)
     console.log(`Carte ${cardId} sélectionnée`);
   };
 
   return (
     <div className={styles.handContainer}>
       {hand.map(card => (
-        <Card
+        <CardView
           key={card.id}
-          title={card.title}
-          content={card.content}
+          card={card}
           onClick={() => handleCardClick(card.id)}
+          selected={card.id === selectedCardId}
         />
       ))}
     </div>
@@ -35,3 +34,4 @@ const PlayerHand = ({ hand }) => {
 };
 
 export default PlayerHand;
+m

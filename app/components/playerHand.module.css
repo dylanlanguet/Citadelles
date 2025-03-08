@@ -1,7 +1,13 @@
 .handContainer {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 10px;
-  }
-  
+  white-space: nowrap;       /* Empêche le retour à la ligne */
+  overflow-x: auto;          /* Active le défilement horizontal */
+  padding: 10px;
+  background: #f9f9f9;       /* Optionnel : pour voir le conteneur */
+}
+
+/* Assure-toi que les éléments enfants (les cartes) soient en inline-block */
+.handContainer > * {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 10px;        /* Espacement entre les cartes */
+}
